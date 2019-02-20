@@ -152,7 +152,7 @@ if __name__ == '__main__':
        if flag:
           targets.append(ts)
        del ds
-       #print('rank-{} : {}/{} is done '.format(rank, i, len(my_chunk)))
+       print('rank-{} : {}/{} is done '.format(rank, i, len(my_chunk)))
    if rank==0:print("rank {} finished in {} sec ".format(rank, time()-t1))
 
    comm.Barrier()
