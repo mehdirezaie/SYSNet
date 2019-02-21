@@ -30,8 +30,8 @@ nn1=nn_ab
 # python $multfit --input $glmp5 --output ${oudr_r}${mult2}/ --split --ax 5
 # took around 10 secs
 #
-mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
-
+# mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
+# took 30 min on DR7
 
 # CLUSTERING
 #
