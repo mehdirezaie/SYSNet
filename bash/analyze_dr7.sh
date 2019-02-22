@@ -19,18 +19,18 @@ nn1=nn_ab
 # REGRESSION
 #
 # Feb 20: Ablation on DR7
-mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab
-# took 54 min
+# mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab
+# took 50 min
 
 # Feb 21: Linear/quadratic multivariate fit on DR7 
 #         Linear/quadratic depth-z fit on DR7
 #         NN fit on DR7 with ablation
 #
-python $multfit --input $glmp5 --output ${oudr_r}${mult1}/ --split
-python $multfit --input $glmp5 --output ${oudr_r}${mult2}/ --split --ax 5
+# python $multfit --input $glmp5 --output ${oudr_r}${mult1}/ --split
+# python $multfit --input $glmp5 --output ${oudr_r}${mult2}/ --split --ax 5
 # took around 10 secs
 #
-mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
+# mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
 # took 30 min on DR7
 
 # CLUSTERING

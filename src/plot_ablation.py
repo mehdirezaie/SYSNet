@@ -6,6 +6,18 @@ import seaborn as sns
 
 
 def ablation_plot(filename):    
+    params = {
+    'axes.spines.right':False,
+    'axes.spines.top':False,
+    'axes.labelsize': 12,
+    #'text.fontsize': 8,
+    'legend.fontsize': 12,
+    'xtick.labelsize': 10,
+    'ytick.labelsize': 10,
+    'text.usetex': True,
+    #'figure.figsize': [6, 4],
+    'font.family':'serif'}
+    plt.rcParams.update(params)
     ab1 = np.load(filename).item()
     #
     INDICES = ab1['indices']
