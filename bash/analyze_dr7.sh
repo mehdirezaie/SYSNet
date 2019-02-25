@@ -5,7 +5,10 @@ source activate py3p6
 ablation=/Users/rezaie/github/SYSNet/src/ablation.py
 multfit=/Users/rezaie/github/SYSNet/src/mult_fit.py
 nnfit=/Users/rezaie/github/SYSNet/src/nn_fit.py
+split=/Users/rezaie/github/SYSNet/src/add_features-split.py
 
+
+# DATA
 # output dirs & labels
 glmp5=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.5.r.npy
 oudr_ab=/Volumes/TimeMachine/data/DR7/results/ablation/
@@ -15,7 +18,14 @@ mult2=mult_depz
 log_ab=dr7.log
 nn1=nn_ab
 
+# MOCKS
+pathmock=/Volumes/TimeMachine/data/mocks/3dbox/
+umockext=*/*.hp.256.fits 
+umock5l=.hp.256.5.r.npy
+mockfeat=/Volumes/TimeMachine/data/mocks/mocks.DR7.table.fits
+mlog_ab=mock.log
 # ================ RUNS ====================
+# DATA
 # REGRESSION
 #
 # Feb 20: Ablation on DR7
@@ -35,3 +45,25 @@ nn1=nn_ab
 
 # CLUSTERING
 #
+
+
+# ============= MOCKS =======================
+# Feb 22
+# Add features to uncontaminated
+# mpirun --oversubscribe -np 4 python $split --hpmap $pathmock --ext $umockext --features $mockfeat --split r
+# took 2 min
+
+# Ablation on mocks
+# for i in $(seq -f "%03g" 1 100)
+# do
+#   mglmp5=${pathmock}${i}/${i}${umock5l}
+#   moudr_ab=${pathmock}${i}/results/ablation/
+#   echo ablation on $mglmp5
+#   mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab
+# done
+# took 45 hours
+
+
+
+
+ 

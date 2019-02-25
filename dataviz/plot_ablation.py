@@ -12,10 +12,10 @@ def ablation_plot(filename):
     'axes.labelsize': 12,
     #'text.fontsize': 8,
     'legend.fontsize': 12,
-    'xtick.labelsize': 10,
-    'ytick.labelsize': 10,
+    'xtick.labelsize': 12,
+    'ytick.labelsize': 12,
     'text.usetex': True,
-    #'figure.figsize': [6, 4],
+    'figure.figsize': [6, 4], # 11 9
     'font.family':'serif'}
     plt.rcParams.update(params)
     ab1 = np.load(filename).item()
@@ -31,7 +31,7 @@ def ablation_plot(filename):
             matric_dict[str(i)+'-'+str(INDICES[i][j])] = VALUES[i][j]
 
     matric = np.zeros(shape=(18, 18))
-    for i in range(16):
+    for i in range(17):
         for j, sys_i in enumerate(FEAT):
             if str(i)+'-'+str(sys_i) in matric_dict.keys():
                 matric[i,j] = (matric_dict['%d-%d'%(i,sys_i)][0]/ab1['RMSEall'])-1.#-ab1['baselineRMSE']
@@ -50,17 +50,33 @@ def ablation_plot(filename):
     mask[matric==0.0] = False
     vmin = np.minimum(np.abs(np.min(matric)), np.abs(np.max(matric))) #* 0.1
     # Set up the matplotlib figure
-    f, ax = plt.subplots(figsize=(11, 9))
+    f, ax = plt.subplots()
     #plt.title('Correlation Matrix of DR5')
     # Generate a custom diverging colormap
     kw = dict(mask=~mask, cmap=plt.cm.seismic_r, xticklabels=xlabels,
-               yticklabels=xlabels[::-1], center=0.0, vmin=-1.*vmin, vmax=vmin, 
-                square=True, linewidths=.5, cbar_kws={"shrink": .5, "label":r'$10^{4} \times \delta$RMSE'})
+               yticklabels=xlabels[::-1], 
+               center=0.0, vmin=-1.*vmin, vmax=vmin, 
+               square=True, linewidths=.5, 
+               cbar_kws={"shrink": .5, 
+               "label":r'$10^{4} \times \delta$RMSE'})
     # Draw the heatmap with the mask and correct aspect ratio
     sns.heatmap(matric, **kw)
     ax.set_xticklabels(xlabels, rotation=80)
     ax.set_yticks([])
     ax.xaxis.tick_top()
+    bbox_props = dict(boxstyle="rarrow", fc=(0.8, 0.9, 0.9), ec="b", lw=2)
+    t = ax.text(0.5, 0.2, "Importance",
+                ha="center", va="center", rotation=0,
+                transform=ax.transAxes,
+                bbox=bbox_props)
+    bb = t.get_bbox_patch()
+    bb.set_boxstyle("rarrow", pad=0.6)
+    t1 = ax.text(0.2, 0.5, "Iteration",
+                ha="center", va="center", rotation=-90,
+                transform=ax.transAxes,
+                bbox=bbox_props)
+    bb1 = t1.get_bbox_patch()
+    bb1.set_boxstyle("rarrow", pad=0.6)
     ou = ''.join([filename[:-4], '.pdf']) # drop .npy
     print('save ... ', ou)
     plt.savefig(ou, bbox_inches='tight')
