@@ -24,12 +24,14 @@ umockext=*/*.hp.256.fits
 umock5l=.hp.256.5.r.npy
 mockfeat=/Volumes/TimeMachine/data/mocks/mocks.DR7.table.fits
 mlog_ab=mock.log
+
+
 # ================ RUNS ====================
 # DATA
 # REGRESSION
 #
 # Feb 20: Ablation on DR7
-# mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab
+mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab
 # took 50 min
 
 # Feb 21: Linear/quadratic multivariate fit on DR7 
@@ -40,11 +42,8 @@ mlog_ab=mock.log
 # python $multfit --input $glmp5 --output ${oudr_r}${mult2}/ --split --ax 5
 # took around 10 secs
 #
-# mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
+mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
 # took 30 min on DR7
-
-# CLUSTERING
-#
 
 
 # ============= MOCKS =======================
@@ -54,16 +53,27 @@ mlog_ab=mock.log
 # took 2 min
 
 # Ablation on mocks
-# for i in $(seq -f "%03g" 1 100)
-# do
-#   mglmp5=${pathmock}${i}/${i}${umock5l}
-#   moudr_ab=${pathmock}${i}/results/ablation/
-#   echo ablation on $mglmp5
-#   mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab
-# done
+for i in $(seq -f "%03g" 1 100)
+do
+   mglmp5=${pathmock}${i}/${i}${umock5l}
+   moudr_ab=${pathmock}${i}/results/ablation/
+   echo ablation on $mglmp5
+   mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab
+done
 # took 45 hours
 
 
-
-
- 
+# Feb 25
+# Lin/quadratic fit on null mocks
+# NN with ablation fit 
+#
+for i in $(seq -f "%03g" 1 100)
+do
+  mglmp5=${pathmock}${i}/${i}${umock5l}
+  moudr_r=${pathmock}${i}/results/regression/
+  moudr_ab=${pathmock}${i}/results/ablation/
+  echo fit on $mglmp5
+  #python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
+  mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
+done
+# took 4 h

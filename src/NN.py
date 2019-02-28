@@ -108,20 +108,20 @@ class Netregression(object):
             # need to modify this if more layers are desired
             # tf.layers.dense works like f(aX+b) where f is activation
             if (len(Units) == 1) and Units[0]==0:    # linear
-                kernel_init = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature+1)), seed=seeds[ii])
+                kernel_init = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature)), seed=seeds[ii])
                 y  = tf.layers.dense(x, units=nclass, activation=None, kernel_initializer=kernel_init,
                                     kernel_regularizer=tf.contrib.layers.l2_regularizer(scale=scale))
             elif len(Units) == 1 and Units[0]!=0: # 1 hidden layer
-                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature+1)), seed=seeds[ii])
-                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0]+1)), seed=seeds[ii]) 
+                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature)), seed=seeds[ii])
+                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0])), seed=seeds[ii]) 
                 y0 = tf.layers.dense(x,  units=Units[0], activation=actfunc, kernel_initializer=kernel_init0,
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale)) 
                 y  = tf.layers.dense(y0, units=nclass, activation=None, kernel_initializer=kernel_init,
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale)) 
             elif len(Units) == 2:                                    # 2 hidden layers
-                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature+1)), seed=seeds[ii])
-                kernel_init1 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0]+1)), seed=seeds[ii]) 
-                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[1]+1)), seed=seeds[ii]) 
+                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature)), seed=seeds[ii])
+                kernel_init1 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0])), seed=seeds[ii]) 
+                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[1])), seed=seeds[ii]) 
                 y0 = tf.layers.dense(x,  units=Units[0], activation=actfunc, kernel_initializer=kernel_init0,
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale))
                 y1 = tf.layers.dense(y0, units=Units[1], activation=actfunc, kernel_initializer=kernel_init1,
@@ -129,10 +129,10 @@ class Netregression(object):
                 y  = tf.layers.dense(y1, units=nclass,   activation=None,  kernel_initializer=kernel_init,
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale))
             elif len(Units) == 3:
-                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature+1)), seed=seeds[ii])
-                kernel_init1 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0]+1)), seed=seeds[ii]) 
-                kernel_init2 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[1]+1)), seed=seeds[ii]) 
-                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[2]+1)), seed=seeds[ii]) 
+                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature)), seed=seeds[ii])
+                kernel_init1 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0])), seed=seeds[ii]) 
+                kernel_init2 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[1])), seed=seeds[ii]) 
+                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[2])), seed=seeds[ii]) 
                 y0 = tf.layers.dense(x,  units=Units[0], activation=actfunc, kernel_initializer=kernel_init0,
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale))
                 y1 = tf.layers.dense(y0, units=Units[1], activation=actfunc,  kernel_initializer=kernel_init1,
@@ -142,11 +142,11 @@ class Netregression(object):
                 y  = tf.layers.dense(y2, units=nclass,   activation=None,  kernel_initializer=kernel_init, 
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale))
             elif len(Units) == 4:
-                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature+1)), seed=seeds[ii])
-                kernel_init1 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0]+1)), seed=seeds[ii]) 
-                kernel_init2 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[1]+1)), seed=seeds[ii]) 
-                kernel_init3 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[2]+1)), seed=seeds[ii]) 
-                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[3]+1)), seed=seeds[ii]) 
+                kernel_init0 = tf.random_normal_initializer(stddev=np.sqrt(1./(nfeature)), seed=seeds[ii])
+                kernel_init1 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[0])), seed=seeds[ii]) 
+                kernel_init2 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[1])), seed=seeds[ii]) 
+                kernel_init3 = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[2])), seed=seeds[ii]) 
+                kernel_init  = tf.random_normal_initializer(stddev=np.sqrt(2./(Units[3])), seed=seeds[ii]) 
                 y0 = tf.layers.dense(x,  units=Units[0], activation=actfunc, kernel_initializer=kernel_init0,
                                     kernel_regularizer= tf.contrib.layers.l2_regularizer(scale=scale))
                 y1 = tf.layers.dense(y0, units=Units[1], activation=actfunc, kernel_initializer=kernel_init1,

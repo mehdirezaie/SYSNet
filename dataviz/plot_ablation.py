@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sns
 
 
-def ablation_plot(filename):    
+def ablation_plot(filename, odir):    
     params = {
     'axes.spines.right':False,
     'axes.spines.top':False,
@@ -77,7 +77,9 @@ def ablation_plot(filename):
                 bbox=bbox_props)
     bb1 = t1.get_bbox_patch()
     bb1.set_boxstyle("rarrow", pad=0.6)
-    ou = ''.join([filename[:-4], '.pdf']) # drop .npy
+    fname = filename.split('/')[-1][:-4]  # drop .npy
+    #ou = ''.join([filename[:-4], '.pdf']) # drop .npy
+    ou = ''.join([odir, fname, '.pdf'])
     print('save ... ', ou)
     plt.savefig(ou, bbox_inches='tight')
 
@@ -85,5 +87,5 @@ def ablation_plot(filename):
 import sys
 
 
-ablation_plot(sys.argv[1])
+ablation_plot(sys.argv[1], sys.argv[2])
 
