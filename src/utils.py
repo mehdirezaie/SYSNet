@@ -62,21 +62,22 @@ def hpixsum(nside, ra, dec, value=None):
 def makedelta(map1, weight1, mask, select_fun=None, is_sys=False):
     delta = np.zeros_like(map1)
     if select_fun is not None:
-        randc = weight1 * select_fun
+        gmap = map1 / select_fun
     else:
-        randc = weight1
+        gmap = map1.copy()
+
     #assert((randc[mask]==0).sum() == 0) # make sure there is no empty pixel
-    if (randc[mask]==0).sum() != 0:
+    if (weight1[mask]==0).sum() != 0:
         print('there are empty weights')
-        m = randc == 0
-        randc[m] = 1.0 # enforece one
+        m = weight1 == 0
+        weight1[m] = 1.0 # enforece one
        
     if is_sys:
-        sf = (map1[mask]*randc[mask]).sum() / randc[mask].sum()
-        delta[mask] = map1[mask] / sf - 1
+        sf = (gmap[mask]*weight1[mask]).sum() / weight1[mask].sum()
+        delta[mask] = gmap[mask] / sf - 1
     else:
-        sf = map1[mask].sum()/randc[mask].sum()
-        delta[mask] = map1[mask]/(randc[mask]*sf)  - 1   
+        sf = gmap[mask].sum()/weight1[mask].sum()
+        delta[mask] = gmap[mask]/(weight1[mask]*sf)  - 1   
     return delta
 
 
