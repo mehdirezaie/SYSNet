@@ -449,7 +449,8 @@ if rank ==0:
     oudata['hpind']   = hpix
     oudata['weight']  = ngal.T
     oumap             = np.zeros(12*NSIDE*NSIDE)
-    oumap[hpix]       = np.mean(ngal, axis=0)
+    #oumap[hpix]       = np.mean(ngal, axis=0)
+    oumap[hpix]      = np.median(ngal, axis=0)
 
     np.save(oupath+'nn-rmse', rmselist)
     ft.write(oupath+'nn-weights'+str(NSIDE)+'.fits', oudata, clobber=True)
