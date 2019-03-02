@@ -82,26 +82,26 @@ mfrac=/Volumes/TimeMachine/data/mocks/fracgood.hp256.fits
 #
 # Clustering
 # March 1
-#
-#for i in $(seq -f "%03g" 2 100)
-#do
-#  mglmp=${pathmock}${i}/${i}${umockl}
-#  moudr_r=${pathmock}${i}/results/regression/
-#  moudr_c=${pathmock}${i}/results/clustering/
-# no weight - lin - weight
-#  for multw in uni lin quad
-#  do
-#     wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
-#     clnm=cl_${multw}
-#     echo "clustering on $mglmp w $wmap"
-#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
-#  done
+# Use the median to upweight galaxies
+for i in $(seq -f "%03g" 1 100)
+do
+  mglmp=${pathmock}${i}/${i}${umockl}
+  moudr_r=${pathmock}${i}/results/regression/
+  moudr_c=${pathmock}${i}/results/clustering-upw/
+  # no weight - lin - weight
+  for multw in uni lin quad
+  do
+     wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
+     clnm=cl_${multw}
+     echo "clustering on $mglmp w $wmap"
+     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
+  done
  # nn weights
-# wmap=${moudr_r}${nn1}/nn-weights.hp256.fits
-# clnm=cl_nn
-# echo "clustering on $mglmp w $wmap"
-# mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
-#done
+ wmap=${moudr_r}${nn1}/nn-weights.hp256.fits
+ clnm=cl_nn
+ echo "clustering on $mglmp w $wmap"
+ mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
+done
 
 #
 # use the median
