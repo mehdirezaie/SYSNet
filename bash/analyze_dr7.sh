@@ -10,9 +10,14 @@ docl=/Users/rezaie/github/SYSNet/src/run_pipeline.py
 
 # DATA
 # output dirs & labels
+glmp=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.cut.hp256.fits
 glmp5=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.5.r.npy
+drfeat=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.fits
+rnmp=/Volumes/TimeMachine/data/DR7/frac.hp.256.fits
 oudr_ab=/Volumes/TimeMachine/data/DR7/results/ablation/
 oudr_r=/Volumes/TimeMachine/data/DR7/results/regression/
+oudr_c=/Volumes/TimeMachine/data/DR7/results/clustering/
+maskc=/Volumes/TimeMachine/data/DR7/mask.cut.hp.256.fits    # remove pixels with extreme weights
 mult1=mult_all
 mult2=mult_depz
 log_ab=dr7.log
@@ -46,6 +51,21 @@ mfrac=/Volumes/TimeMachine/data/mocks/fracgood.hp256.fits
 #
 # mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
 # took 30 min on DR7
+
+# March 6: 
+# Run NNbar
+# C_l for DR7
+# for wname in uni lin quad
+# do
+#    wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#    mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --clfile cl_$wname --nnbar nnbar_$wname
+# done
+# wmap=${oudr_r}${nn1}/nn-weights.hp256.fits
+# mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --nnbar nnbar_$nn1 --clfile cl_$nn1 
+
+# auto C_l for systematics
+mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys
+
 
 
 # ============= MOCKS =======================
@@ -81,40 +101,23 @@ mfrac=/Volumes/TimeMachine/data/mocks/fracgood.hp256.fits
 # took 4 h
 #
 # Clustering
-# March 1
-# Use the median to upweight galaxies
-for i in $(seq -f "%03g" 1 100)
-do
-  mglmp=${pathmock}${i}/${i}${umockl}
-  moudr_r=${pathmock}${i}/results/regression/
-  moudr_c=${pathmock}${i}/results/clustering-upw/
-  # no weight - lin - weight
-  for multw in uni lin quad
-  do
-     wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
-     clnm=cl_${multw}
-     echo "clustering on $mglmp w $wmap"
-     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
-  done
- # nn weights
- wmap=${moudr_r}${nn1}/nn-weights.hp256.fits
- clnm=cl_nn
- echo "clustering on $mglmp w $wmap"
- mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
-done
-
-#
-# use the median
-#for i in 001 006 007 008 010 013 015 016 017 018 019 021 025 026 027 030 031 032 035 036 039 047 049 051 054 055 056 058 059 063 067 068 070 072 079 081 085 087 089 090 092
-#do 
-  #mglmp=${pathmock}${i}/${i}${umockl}
-  #moudr_r=${pathmock}${i}/results/regression/
-  #moudr_c=${pathmock}${i}/results/clustering/
- # nn weights
- #wmap=${moudr_r}${nn1}/nnm-weights.hp256.fits
- #clnm=cl_nnm
- #echo "clustering on $mglmp w $wmap"
- #mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
-#done
-
-
+# March 1 : Use the median to upweight galaxies
+# for i in $(seq -f "%03g" 1 100)
+# do
+#   mglmp=${pathmock}${i}/${i}${umockl}
+#   moudr_r=${pathmock}${i}/results/regression/
+#   moudr_c=${pathmock}${i}/results/clustering-upw/
+#   # no weight - lin - weight
+#   for multw in uni lin quad
+#   do
+#      wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
+#      clnm=cl_${multw}
+#      echo "clustering on $mglmp w $wmap"
+#      mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
+#   done
+#  # nn weights
+#  wmap=${moudr_r}${nn1}/nn-weights.hp256.fits
+#  clnm=cl_nn
+#  echo "clustering on $mglmp w $wmap"
+#  mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmask} --clfile ${clnm} --oudir ${moudr_c} --verbose 
+# done

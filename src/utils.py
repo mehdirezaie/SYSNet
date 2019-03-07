@@ -37,7 +37,16 @@ except:
     
 
     
-    
+def histedges_equalN(x, nbin=10):
+    '''
+        https://stackoverflow.com/questions/39418380/
+        histogram-with-equal-number-of-points-in-each-bin
+        (c) farenorth
+    '''
+    npt = len(x)
+    return np.interp(np.linspace(0, npt, nbin + 1),
+                     np.arange(npt),
+                     np.sort(x))    
 
 
 def radec2hpix(nside, ra, dec):
