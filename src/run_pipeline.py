@@ -61,12 +61,14 @@ if rank == 0:
     ap.add_argument('--clfile',    default='none')
     ap.add_argument('--clsys',     default='none')    
     ap.add_argument('--corfile',   default='none')
+    ap.add_argument('--corsys',   default='none')
     ap.add_argument('--nnbar',     default='none')
     ap.add_argument('--hpfit',     default='none')
     ap.add_argument('--oudir',     default='./output/')
     ap.add_argument('--axfit',     nargs='*', type=int,\
                                    default=[i for i in range(18)])
     ap.add_argument('--nbin',      default=20, type=int)
+    ap.add_argument('--njack',     default=20, type=int)
     ap.add_argument('--nside',     default=256, type=int)
     ap.add_argument('--lmax',      default=512, type=int)
     ap.add_argument('--smooth',    action='store_true')
@@ -439,7 +441,7 @@ if ns.clsys != 'none':
         log += '{:35s} : {}\n'.format('Total number of mask pixels',  mask1.sum())
         log += '{:35s} : {}\n'.format('Total number of feat pixels',  mask2.sum())
         log += '{:35s} : {}\n'.format('Total number of overlap mask', mask.sum())      
-        log += '{:35s} : {}\n'.format('Compute the cross power spectra against', [labels[n] for n in ns.axfit])
+        log += '{:35s} : {}\n'.format('Compute the auto power spectra for systematics', [labels[n] for n in ns.axfit])
     else:
         x         = None
         ranmap    = None
@@ -498,117 +500,185 @@ if ns.clsys != 'none':
         log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
         fo.write(log)
         if ns.verbose:print(log)    
-# if ns.corfile != 'none':
-#    if rank == 0:
-#        fo   = open(ns.oudir + ns.corfile + '.log', 'w')
-#        fo.write(log)
-#        log  = 2*'\n'
-#        log += '{:15s}{:40s}{:15s}\n'.format(15*'=',\
-#               'Compute the auto and cross corr.',15*'=')
-#        def model(x, *w):
-#            return np.dot(x, w)
-#        from tools import makedelta
-#        #
-#        # read phot. attributes file, must have hpix, features
-#        feat, h   = ft.read(ns.photattrs, header=True, lower=True)
-#        featl     = h.get('FEATURES')
-#        feats     = feat['features'].shape
-#        featl1    = featl[:-3].split(', ')
-#        featlb    = [b for b in featl[-3:]]
-#        #labels    = featl1[:2] + [m.strip()+'-'+r for m in featl1[2:] for r in featlb]
-#        mask1     = hp.read_map(ns.mask,   verbose=False).astype('bool')
-#        mask2     = np.zeros_like(mask1).astype('bool')
-#        mask2[feat['hpix']] = True
-#        mask      = mask1 & mask2         # overlap 
-#        galmap    = hp.read_map(ns.galmap, verbose=False)
-#        ranmap    = hp.read_map(ns.ranmap, verbose=False)
-#        #
-#        # check if weight is available
-#        if not os.path.isfile(ns.wmap):
-#            wmap = None
-#            log += '{:35s} : {}\n'.format('Computing corr. w/o wmap', ns.wmap)
-#        else: 
-#            wmap = hp.read_map(ns.wmap, verbose=False)
-#            log += '{:35s} : {}\n'.format('Computing corr. with wmap', ns.wmap)
-#        # 
-#        # construct delta 
-#        delta_ngal = makedelta(galmap, ranmap, mask, select_fun=wmap)
-#        #
-#        # compute corr.
-#        theta, phi = hp.pix2ang(ns.nside)
-#        map_ngal       = hp.ma(delta_ngal * ranmap)
-#        map_ngal.mask  = np.logical_not(mask)
-#        cl_auto        = hp.anafast(map_ngal.filled(), lmax=ns.lmax)
-#        #
-#        # maps to do the cross correlation
-#        x    = feat['features'][:,ns.axfit]
-#        hpix = feat['hpix']
-#        #
-#        # log
-#        log += '{:15s} : \n'.format('HEADER of PHOT attrs')
-#        log += '{}\n'.format(h)
-#        log += '{:35s} : {}\n'.format('Phot attrs names', labels)
-#        log += '\n'
-#        log += '{:35s} : {}\n'.format('Shape of the phot. attrs', feats)
-#        log += '{:35s} : {}\n'.format('Total number of mask pixels',  mask1.sum())
-#        log += '{:35s} : {}\n'.format('Total number of feat pixels',  mask2.sum())
-#        log += '{:35s} : {}\n'.format('Total number of overlap mask', mask.sum())      
-#        log += '{:35s} : {}\n'.format('Compute the cross power spectra against', [labels[n] for n in ns.axfit])
-#    else:
-#        x         = None
-#        ranmap    = None
-#        mask      = None
-#        map_ngal  = None
-#        hpix      = None
-#        makedelta = None
+            
+#
+# Corr
+if ns.corfile != 'none':    
+    from xi import run_XI
+    if rank == 0:        
+        fo   = open(ns.oudir + ns.corfile + '.log', 'w')
+        fo.write(log)
+        log  = 2*'\n'
+        log += '{:15s}{:40s}{:15s}\n'.format(15*'=',\
+              'Compute the auto and cross xi',15*'=')
+        from utils import makedelta
+        #
+        # read phot. attributes file, must have hpix, features
+        feat, h   = ft.read(ns.photattrs, header=True, lower=True)
+        feats     = feat['features'].shape
+        mask1     = hp.read_map(ns.mask,   verbose=False).astype('bool')
+        mask2     = np.zeros_like(mask1).astype('bool')
+        mask2[feat['hpind']] = True
+        mask      = mask1 & mask2         # overlap 
+        galmap    = hp.read_map(ns.galmap, verbose=False)
+        ranmap    = hp.read_map(ns.ranmap, verbose=False)
+        #
+        # check if weight is available
+        if not os.path.isfile(ns.wmap):
+            wmap = None
+            log += '{:35s} : {}\n'.format('Computing Xi w/o wmap', ns.wmap)
+        else: 
+            wmap = hp.read_map(ns.wmap, verbose=False)
+            log += '{:35s} : {}\n'.format('Computing Xi with wmap', ns.wmap)
+            if ns.smooth:
+                log += '{:35s}\n'.format('Smoothing the wmap')
+                wmap[~mask] = np.mean(wmap[mask]) # fill in empty pixels ?? required for smoothing 
+                sdeg = np.deg2rad(0.25)           # smooth with sigma of 1/4 of a deg
+                wmap = hp.sphtfunc.smoothing(wmap.copy(), sigma=sdeg)
+        # 
+        # compute auto Xi
+        xi_auto = run_XI(None, galmap, ranmap, wmap, mask, sysm=None, njack=ns.njack, Return=True)
+
+        #
+        # maps to do the cross correlation
+        x    = feat['features'][:,ns.axfit]
+        hpix = feat['hpind']
+        #
+        # log
+        log += '{:15s} : \n'.format('HEADER of PHOT attrs')
+        log += '{}\n'.format(h)
+        log += '{:35s} : {}\n'.format('Phot attrs names', labels)
+        log += '\n'
+        log += '{:35s} : {}\n'.format('Shape of the phot. attrs', feats)
+        log += '{:35s} : {}\n'.format('Total number of mask pixels',  mask1.sum())
+        log += '{:35s} : {}\n'.format('Total number of feat pixels',  mask2.sum())
+        log += '{:35s} : {}\n'.format('Total number of overlap mask', mask.sum())      
+        log += '{:35s} : {}\n'.format('Compute the cross corr. functions against', [labels[n] for n in ns.axfit])
+    else:
+        x         = None
+        ranmap    = None
+        mask      = None
+        galmap    = None
+        hpix      = None
+        wmap      = None
+        
        
-#    #
-#    # bcast
-#    x          = comm.bcast(x, root=0)
-#    map_ngal   = comm.bcast(map_ngal, root=0)
-#    mask       = comm.bcast(mask, root=0)
-#    ranmap     = comm.bcast(ranmap, root=0)
-#    hpix       = comm.bcast(hpix, root=0)
-#    makedelta  = comm.bcast(makedelta, root=0)
-#    from healpy import ma, anafast
-
-#    #
-#    # split the sysmaps (x) among workers
-#    if x.shape[1]%size ==0:
-#       my_size = x.shape[1] // size
-#    else:
-#       my_size = x.shape[1] // size + 1
-#    my_i  = rank*my_size
-#    my_f  = np.minimum(x.shape[1], (rank+1)*my_size)
-#    my_x  = x[:, my_i:my_f]
-#    my_cl = []
-#    for i in range(my_i, my_f):
-#       sys_i        = np.zeros_like(ranmap)
-#       sys_i[hpix]  = x[:, i]
-#       delta_sys    = makedelta(sys_i, ranmap, mask, select_fun=None, is_sys=True)
-#       map_sys      = ma(delta_sys)
-#       map_sys.mask = np.logical_not(mask)
-#       my_cl_i      = anafast(map_ngal.filled(), map2=map_sys.filled(),\
-#                              lmax=ns.lmax)
-#       my_cl.append(my_cl_i)
-
-#    #
-#    # gather the cross power spectra
-#    comm.Barrier()
-#    my_cl = comm.gather(my_cl, root=0)
-#    if rank == 0:
-#       all_cl = np.concatenate(my_cl, axis=0)
-#       colors = plt.cm.jet
-#       plt.figure()
-#       for j in range(all_cl.shape[0]):
-#          plt.plot(np.arange(all_cl.shape[1]), all_cl[j,:],\
-#                   label=r'Ngal$\times$%s'%labels[ns.axfit[j]], color=colors(j/all_cl.shape[0]))
-#       plt.plot(np.arange(cl_auto.size), cl_auto, color='k', label=r'Ngal$\times$Ngal')
-#       plt.xscale('log');plt.legend(ncol=2, bbox_to_anchor=(1.01,1.01))
-#       plt.ylabel(r'C$_{l}$');plt.xlabel('l')
-#       plt.savefig(ns.oudir + ns.clfile + '.png', bbox_inches='tight', dpi=300)
-#       All_cl = dict(cross=all_cl, auto=cl_auto, clabels=[labels[n] for n in ns.axfit])
-#       np.save(ns.oudir  + ns.clfile, All_cl)
-#       log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
-#       fo.write(log)
-#       if ns.verbose:print(log)
+    #
+    # bcast
+    x          = comm.bcast(x, root=0)
+    galmap     = comm.bcast(galmap, root=0)
+    mask       = comm.bcast(mask,   root=0)
+    ranmap     = comm.bcast(ranmap, root=0)
+    hpix       = comm.bcast(hpix, root=0)
+    wmap       = comm.bcast(wmap, root=0)
+    
+    
+    #
+    # split the sysmaps (x) among workers
+    if x.shape[1]%size ==0:
+        my_size = x.shape[1] // size
+    else:
+        my_size = x.shape[1] // size + 1
+    #
+    #
+    my_i  = rank*my_size
+    my_f  = np.minimum(x.shape[1], (rank+1)*my_size)
+    my_x  = x[:, my_i:my_f]
+    my_xi = []
+    for i in range(my_i, my_f):
+        sys_i        = np.zeros_like(ranmap)
+        sys_i[hpix]  = x[:, i]
+        my_xi_i      = run_XI(None, galmap, ranmap, wmap, mask, sysm=sys_i, njack=ns.njack, Return=True)
+        my_xi.append(my_xi_i)
+    #
+    #
+    # gather the cross power spectra
+    comm.Barrier()
+    my_xi = comm.gather(my_xi, root=0)
+    if rank == 0:
+        #print(my_xi, type(my_xi), len(my_xi))
+        all_xi = np.concatenate(my_xi, axis=0)
+        All_xi = dict(cross=all_xi, auto=xi_auto, clabels=[labels[n] for n in ns.axfit])
+        np.save(ns.oudir  + ns.corfile, All_xi)
+        log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
+        fo.write(log)
+        if ns.verbose:print(log)
+            
+if ns.corsys != 'none':    
+    from xi import run_XIsys
+    if rank == 0:        
+        fo   = open(ns.oudir + ns.corsys + '.log', 'w')
+        fo.write(log)
+        log  = 2*'\n'
+        log += '{:15s}{:40s}{:15s}\n'.format(15*'=',\
+              'Compute the auto corr for systematics',15*'=')
+        from utils import makedelta
+        #
+        # read phot. attributes file, must have hpix, features
+        feat, h   = ft.read(ns.photattrs, header=True, lower=True)
+        feats     = feat['features'].shape
+        mask1     = hp.read_map(ns.mask,   verbose=False).astype('bool')
+        mask2     = np.zeros_like(mask1).astype('bool')
+        mask2[feat['hpind']] = True
+        mask      = mask1 & mask2         # overlap 
+        ranmap    = hp.read_map(ns.ranmap, verbose=False)
+        #
+        # maps to do the cross correlation
+        x    = feat['features'][:,ns.axfit]
+        hpix = feat['hpind']
+        #
+        # log
+        log += '{:15s} : \n'.format('HEADER of PHOT attrs')
+        log += '{}\n'.format(h)
+        log += '{:35s} : {}\n'.format('Phot attrs names', labels)
+        log += '\n'
+        log += '{:35s} : {}\n'.format('Shape of the phot. attrs', feats)
+        log += '{:35s} : {}\n'.format('Total number of mask pixels',  mask1.sum())
+        log += '{:35s} : {}\n'.format('Total number of feat pixels',  mask2.sum())
+        log += '{:35s} : {}\n'.format('Total number of overlap mask', mask.sum())      
+        log += '{:35s} : {}\n'.format('Compute the auto corr. functions for systematics', [labels[n] for n in ns.axfit])
+    else:
+        x         = None
+        ranmap    = None
+        mask      = None
+        hpix      = None
+        
+       
+    #
+    # bcast
+    x          = comm.bcast(x, root=0)
+    mask       = comm.bcast(mask,   root=0)
+    ranmap     = comm.bcast(ranmap, root=0)
+    hpix       = comm.bcast(hpix, root=0)
+    
+    
+    #
+    # split the sysmaps (x) among workers
+    if x.shape[1]%size ==0:
+        my_size = x.shape[1] // size
+    else:
+        my_size = x.shape[1] // size + 1
+    #
+    #
+    my_i  = rank*my_size
+    my_f  = np.minimum(x.shape[1], (rank+1)*my_size)
+    my_x  = x[:, my_i:my_f]
+    my_xi = []
+    for i in range(my_i, my_f):
+        sys_i        = np.zeros_like(ranmap)
+        sys_i[hpix]  = x[:, i]
+        my_xi_i      = run_XIsys(None, sys_i, ranmap, mask, Return=True)
+        my_xi.append(my_xi_i)
+    #
+    #
+    # gather the cross power spectra
+    comm.Barrier()
+    my_xi = comm.gather(my_xi, root=0)
+    if rank == 0:
+        #print(my_xi, type(my_xi), len(my_xi))
+        all_xi = np.concatenate(my_xi, axis=0)
+        All_xi = dict(cross=all_xi, auto=None, clabels=[labels[n] for n in ns.axfit])
+        np.save(ns.oudir  + ns.corsys, All_xi)
+        log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
+        fo.write(log)
+        if ns.verbose:print(log)            

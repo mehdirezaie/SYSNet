@@ -73,7 +73,7 @@ def makedelta(map1, weight1, mask, select_fun=None, is_sys=False):
     if select_fun is not None:
         gmap = map1 / select_fun
     else:
-        gmap = map1.copy()
+        gmap = map1#.copy()
 
     #assert((randc[mask]==0).sum() == 0) # make sure there is no empty pixel
     if (weight1[mask]==0).sum() != 0:

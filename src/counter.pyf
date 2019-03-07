@@ -1,0 +1,20 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module counter ! in 
+    interface  ! in : counter
+        subroutine paircount(theta1, phi1, theta2, phi2, delta1, delta2, fpix1, fpix2, bins, auto, c, n1, n2, m) ! in : counter: counter.f90
+            real(kind=8) dimension(n),intent(in),depend(n1) :: theta1, phi1, delta1, fpix1
+            real(kind=8) dimension(n),intent(in),depend(n2) :: theta2, phi2, delta2, fpix2            
+            real(kind=8) dimension(m),intent(in),depend(m+1) :: bins
+            integer, optional,intent(in),check(shape(delta1,0)==n1),depend(delta1) :: n1=shape(delta1,0)
+            integer, optional,intent(in),check(shape(delta2,0)==n2),depend(delta2) :: n2=shape(delta2,0)            
+            integer, intent(in) :: auto
+            integer, optional,intent(in),check(shape(bins,0)==m+1),depend(bins) :: m=shape(bins,0)+1
+            real(kind=8) dimension(2,m),intent(out),depend(2,m) :: c
+        end subroutine paircount
+    end interface 
+end python module counter
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

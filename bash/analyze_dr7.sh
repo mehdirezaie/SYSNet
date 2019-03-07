@@ -64,8 +64,19 @@ mfrac=/Volumes/TimeMachine/data/mocks/fracgood.hp256.fits
 # mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --nnbar nnbar_$nn1 --clfile cl_$nn1 
 
 # auto C_l for systematics
-mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys
+# mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys
 
+# March 7: Run corr. functions
+# each takes 10 min on 2 mpi process
+# for wname in uni lin quad
+# do
+#    wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#    time mpirun --oversubscribe -np 2 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --corfile xi_$wname 
+# done
+#wmap=${oudr_r}${nn1}/nn-weights.hp256.fits
+#time mpirun --oversubscribe -np 2 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --corfile xi_$nn1 
+# auto corr. for systematics
+mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --corsys xi_sys
 
 
 # ============= MOCKS =======================
