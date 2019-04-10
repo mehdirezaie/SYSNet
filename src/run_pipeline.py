@@ -212,7 +212,6 @@ if (ns.nnbar != 'none'):
     if rank == 0:
         fo   = open(ns.oudir + ns.nnbar + '.log', 'w')
         fo.write(log)
-        from utils import histedges_equalN
         from nnbar import NNBAR
         log  = 2*'\n'
         log += '{:15s}{:40s}{:15s}\n'.format(15*'=',\
@@ -268,8 +267,7 @@ if (ns.nnbar != 'none'):
             sys_i = np.zeros_like(galmap)
             sys_i[feat['hpind']] = feat['features'][:,i]
             #
-            bins  = histedges_equalN(sys_i[mask], nbin=ns.nbin)  # 
-            Nnbar = NNBAR(galmap, ranmap, mask, sys_i, bins, selection=wmap)
+            Nnbar = NNBAR(galmap, ranmap, mask, sys_i, nbins=ns.nbin, selection=wmap)
             Nnbar.run(njack=20)
             nnbar_res['nnbar'].append(Nnbar.output)
             ax[i].errorbar(Nnbar.output['bin_edges'][:-1], Nnbar.output['nnbar'],

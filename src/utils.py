@@ -37,17 +37,32 @@ except:
     
 
     
-def histedges_equalN(x, nbin=10):
+def histedges_equalN(x, nbin=10, kind='size', weight=None):
     '''
         https://stackoverflow.com/questions/39418380/
         histogram-with-equal-number-of-points-in-each-bin
         (c) farenorth
     '''
-    npt = len(x)
-    return np.interp(np.linspace(0, npt, nbin + 1),
+    if kind == 'size':
+        npt = len(x)
+        xp  = np.interp(np.linspace(0, npt, nbin + 1),
                      np.arange(npt),
-                     np.sort(x))    
-
+                     np.sort(x))
+    elif kind == 'area':
+        npt1  = len(x)-1
+        sumw = np.sum(weight) / nbin
+        i    = 0
+        wst  = 0.0
+        xp   = [x.min()]  # lowest bin is the minimum
+        xs, ws =  zip(*sorted(zip(x, weight)))
+        for wsi in ws:
+            wst += wsi
+            i   += 1
+            if (wst > sumw) or (i == npt1):
+                xp.append(xs[i])
+                wst = 0.0
+        xp = np.array(xp)
+    return xp
 
 def radec2hpix(nside, ra, dec):
     pix = hp.ang2pix(nside, np.radians(90 - dec), np.radians(ra))

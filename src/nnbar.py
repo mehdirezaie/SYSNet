@@ -10,7 +10,7 @@ class NNBAR(object):
     """
 
     def __init__(self, galmap, ranmap, mask, 
-                       sysmap, bins, selection=None):
+                       sysmap, nbins=20, selection=None, binning='equi-area'):
         #
         # inputs
         self.nside  = 256#get_nside(galmap)
@@ -23,11 +23,40 @@ class NNBAR(object):
             self.galmap /= selection[mask]
         #    
         # digitize
-        self.sysl   = [0 for k in range(2*bins.size)]
-        inds = np.digitize(self.sysmap, bins)
-        for i in range(1,bins.size): # what if there is nothing on the last bin? FIXME
-            self.sysl[2*i-2] = self.galmap[np.where(inds == i)].tolist()
-            self.sysl[2*i-1] = self.ranmap[np.where(inds == i)].tolist()    
+        if binning == 'simple':
+            bins = np.linspace(self.sysmap.min(), self.sysmap.max(), nbins+1) 
+            self.sysl   = [0 for k in range(2*bins.size)]
+            inds = np.digitize(self.sysmap, bins)
+            for i in range(1,bins.size): # what if there is nothing on the last bin? FIXME
+                self.sysl[2*i-2] = self.galmap[np.where(inds == i)].tolist()
+                self.sysl[2*i-1] = self.ranmap[np.where(inds == i)].tolist()    
+        elif binning == 'equi-area':
+            npts  = self.ranmap.size
+            swtt  = self.ranmap.sum()/nbins  # num of randoms in each bin
+            ss, gs, ws = zip(*sorted(zip(self.sysmap, self.galmap, self.ranmap)))
+            swti = 0.0
+            i   = 0
+            self.sysl = [0 for k in range(2*nbins+2)] 
+            listg = []
+            listr = []
+            bins  = [ss[0]] # first edge is the lowest systematic
+            j     =  0
+            for wsi in ws:
+                swti += wsi
+                listg.append(gs[i])
+                listr.append(ws[i])
+                if (swti >= swtt) or (i == npts-1):
+                    swti  = 0.0
+                    bins.append(ss[i])
+                    self.sysl[2*j]   = listg
+                    self.sysl[2*j+1] = listr
+                    listg = []
+                    listr = []
+                    j += 1
+                i += 1
+            bins = np.array(bins)
+            print('min sys : %.2f  max sys : %.2f'%(ss[0], ss[npts-1]))
+            print('num of pts : %d, num of bins : %d'%(i, j))
         self.avnden = np.sum([np.sum(self.sysl[i]) for i in np.arange(0,2*bins.size, 2)])\
                       /np.sum([np.sum(self.sysl[i]) for i in np.arange(1,2*bins.size, 2)])
         self.bins = bins
