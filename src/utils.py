@@ -106,6 +106,70 @@ def makedelta(map1, weight1, mask, select_fun=None, is_sys=False):
 
 
 
+def clerr_jack(delta, mask, weight, njack=20, lmax=512):
+    '''
+       
+    '''
+    npix = delta.size 
+    hpix = np.argwhere(mask).flatten()
+    dummy = np.ones(mask.sum())
+    hpixl, wl, deltal,_ = split_jackknife(hpix, weight[mask], 
+                                          delta[mask], dummy, njack=njack)
+    cljks = {}
+    for i in range(njack):
+        hpixt   = hpixl.copy()
+        wlt     = wl.copy()
+        deltalt = deltal.copy()
+        #
+        hpixt.pop(i)
+        wlt.pop(i)
+        deltalt.pop(i)
+        #
+        hpixc  = np.concatenate(hpixt)
+        wlc    = np.concatenate(wlt)
+        deltac = np.concatenate(deltalt)
+        #
+        maski  = np.zeros(npix, '?')
+        deltai = np.zeros(npix)
+        wlci   = np.zeros(npix)
+        #
+        maski[hpixc]   = True
+        deltai[hpixc]  = deltac
+        wlci[hpixc]    = wlc
+        #
+        map_i       = hp.ma(deltai * wlci)
+        map_i.mask  = np.logical_not(maski)
+        cljks[i]    = hp.anafast(map_i.filled(), lmax=lmax)
+    #
+    hpixt   = hpixl.copy()
+    wlt     = wl.copy()
+    deltalt = deltal.copy()
+    #
+    hpixc  = np.concatenate(hpixt)
+    wlc    = np.concatenate(wlt)
+    deltac = np.concatenate(deltalt)
+    #
+    maski  = np.zeros(npix, '?')
+    deltai = np.zeros(npix)
+    wlci   = np.zeros(npix)
+    #
+    maski[hpixc]   = True
+    deltai[hpixc]  = deltac
+    wlci[hpixc]    = wlc
+    #
+    map_i       = hp.ma(deltai * wlci)
+    map_i.mask  = np.logical_not(maski)
+    cljks[-1]    = hp.anafast(map_i.filled(), lmax=lmax)   # entire footprint
+    #
+    clvar = np.zeros(len(cljks[-1]))
+    for i in range(njack):
+        clvar += (cljks[-1] - cljks[i])*(cljks[-1] - cljks[i])
+    clvar *= (njack-1)/njack
+    return dict(clerr=np.sqrt(clvar), cljks=cljks)
+
+
+
+
 def split_jackknife(hpix, weight, label, features, njack=20):
     '''
         split_jackknife(hpix, weight, label, features, njack=20)

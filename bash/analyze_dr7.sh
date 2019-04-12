@@ -80,7 +80,10 @@ clab=cp2p
 #wmap=${oudr_r}${nn1}/nn-weights.hp256.fits
 #mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --nnbar nnbar_$nn1 
 
-
+# april 12: auto C_l for uncorrected with Jackknife error
+wmap=uni
+wname=uni
+mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --clfile cl_$wname --verbose 
 
 
 # auto C_l for systematics
@@ -220,18 +223,18 @@ clab=cp2p
 
 
 # fit the true contamination model on the contaminated data
-for i in $(seq -f "%03g" 1 100)
-do
- mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
- moudr_r=${pathmock}${i}/$clab/results/regression/
- echo "fit on $mglmp5"
- python $multfit --input $mglmp5 --output ${moudr_r}${mult3}/ --split --ax 0 1 2 7 10 11 12 14 16 17
- mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
- moudr_c=${pathmock}${i}/$clab/results/clustering/
- wmap=${moudr_r}${mult3}/lin-weights.hp256.fits
- clnm=cl_lin_ab
- echo "clustering on $mglmp w $wmap"
- mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose 
-done
+#for i in $(seq -f "%03g" 1 100)
+#do
+# mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
+# moudr_r=${pathmock}${i}/$clab/results/regression/
+# echo "fit on $mglmp5"
+# python $multfit --input $mglmp5 --output ${moudr_r}${mult3}/ --split --ax 0 1 2 7 10 11 12 14 16 17
+# mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
+# moudr_c=${pathmock}${i}/$clab/results/clustering/
+# wmap=${moudr_r}${mult3}/lin-weights.hp256.fits
+# clnm=cl_lin_ab
+# echo "clustering on $mglmp w $wmap"
+# mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose 
+#done
 
 

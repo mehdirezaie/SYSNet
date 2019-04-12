@@ -298,7 +298,8 @@ if ns.clfile != 'none':
         log  = 2*'\n'
         log += '{:15s}{:40s}{:15s}\n'.format(15*'=',\
               'Compute the auto and cross C_l',15*'=')
-        from utils import makedelta
+        from utils import makedelta, clerr_jack
+        #
         #
         # read phot. attributes file, must have hpix, features
         feat, h   = ft.read(ns.photattrs, header=True, lower=True)
@@ -330,6 +331,8 @@ if ns.clfile != 'none':
         map_ngal       = hp.ma(delta_ngal * ranmap)
         map_ngal.mask  = np.logical_not(mask)
         cl_auto        = hp.anafast(map_ngal.filled(), lmax=ns.lmax)
+        #
+        cl_err         = clerr_jack(delta_ngal, mask, ranmap, njack=ns.njack, lmax=ns.lmax)
         #
         # maps to do the cross correlation
         x    = feat['features'][:,ns.axfit]
@@ -401,7 +404,7 @@ if ns.clfile != 'none':
         plt.xscale('log');plt.legend(ncol=2, bbox_to_anchor=(1.01,1.01))
         plt.ylabel(r'C$_{l}$');plt.xlabel('l')
         plt.savefig(ns.oudir + ns.clfile + '.png', bbox_inches='tight', dpi=300)
-        All_cl = dict(cross=all_cl, auto=cl_auto, clabels=[labels[n] for n in ns.axfit])
+        All_cl = dict(cross=all_cl, auto=cl_auto, clerr=cl_err, clabels=[labels[n] for n in ns.axfit])
         np.save(ns.oudir  + ns.clfile, All_cl)
         log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
         fo.write(log)
