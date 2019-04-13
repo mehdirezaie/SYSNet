@@ -80,7 +80,7 @@ class NNBAR(object):
             mean = ng/npix/self.avnden
             ml.append(mean)
             nl.append(npix)
-            if len(self.sysl[i]) < njack:
+            if (len(self.sysl[i]) < njack) or (njack == 0):  # use the typical std if njack is 0
                 for k in range(0,len(self.sysl[i])):
                     std += (self.sysl[i][k]/self.sysl[i+1][k]/self.avnden-mean)**2.
                 std = np.sqrt(std)/(len(self.sysl[i])-1.)

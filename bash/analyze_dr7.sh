@@ -81,9 +81,9 @@ clab=cp2p
 #mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --nnbar nnbar_$nn1 
 
 # april 12: auto C_l for uncorrected with Jackknife error
-wmap=uni
-wname=uni
-mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --clfile cl_$wname --verbose 
+#wmap=uni
+#wname=uni
+#mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --clfile cl_$wname --verbose 
 
 
 # auto C_l for systematics
@@ -194,7 +194,6 @@ mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photat
 #done
 
 
-
 # Clustering
 # Use the median to upweight galaxies
 #for i in $(seq -f "%03g" 1 100)
@@ -210,7 +209,7 @@ mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photat
 #     echo "clustering on $mglmp w $wmap"
 #     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose 
 #  done
-# # nn weights
+ # nn weights
 # wmap=${moudr_r}${nn1}/nn-weights.hp256.fits
 # clnm=cl_nn
 # echo "clustering on $mglmp w $wmap"
@@ -237,4 +236,38 @@ mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photat
 # mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose 
 #done
 
+# April 13, 19: try the truth contamination on the mocks
+# use the truth contamination and compute the clustering
+#for i in $(seq -f "%03g" 1 100)
+#do
+#  mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
+#  moudr_c=${pathmock}${i}/$clab/results/clustering/
+#  wmap=${oudr_r}${mult3}/lin-weights.hp256.fits
+#  clnm=cl_truth
+#  echo "clustering on $mglmp w $wmap"
+#  mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0
+#done
+
+
+
+
+for i in $(seq -f "%03g" 1 100)
+do
+  mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
+  moudr_r=${pathmock}${i}/$clab/results/regression/
+  moudr_c=${pathmock}${i}/$clab/results/clustering/
+  # no weight - lin - weight
+  for multw in uni lin quad
+  do
+     wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
+     nnnm=nnbar_${multw}
+     echo "nnbar on $mglmp w $wmap"
+     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
+  done
+ # nn weights
+ wmap=${moudr_r}${nn1}/nn-weights.hp256.fits
+ nnnm=nnbar_nn
+ echo "nnbar on $mglmp w $wmap"
+ mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0 
+done
 

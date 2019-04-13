@@ -332,7 +332,10 @@ if ns.clfile != 'none':
         map_ngal.mask  = np.logical_not(mask)
         cl_auto        = hp.anafast(map_ngal.filled(), lmax=ns.lmax)
         #
-        cl_err         = clerr_jack(delta_ngal, mask, ranmap, njack=ns.njack, lmax=ns.lmax)
+        if ns.njack == 0:
+            cl_err = 0.0
+        else:
+            cl_err         = clerr_jack(delta_ngal, mask, ranmap, njack=ns.njack, lmax=ns.lmax)
         #
         # maps to do the cross correlation
         x    = feat['features'][:,ns.axfit]
