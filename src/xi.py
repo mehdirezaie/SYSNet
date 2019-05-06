@@ -53,7 +53,7 @@ def split_jackknife(theta, phi, weight, delta, sysm, njack=20):
             theta_l = []
             phi_l   = []
             delta_l = []
-        elif i == theta.size-1:
+        elif (i == theta.size-1) and (frac > 0.9*f):
             theta_L.append(theta_l)
             phi_L.append(phi_l)
             frac_L.append(frac)
@@ -87,6 +87,7 @@ class XI_JACK(object):
         w = ranmap[mask]
         theta, phi  = hp.pix2ang(self.nside, np.argwhere(mask).flatten())
         thetal, phil, wl, deltal,_ = split_jackknife(theta, phi, w, delta[mask], delta[mask], njack=njack)
+        print('input njack %d, output njack %d'%(njack, len(wl)))
         self.theta  = thetal
         self.phi    = phil
         self.weight = wl

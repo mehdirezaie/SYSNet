@@ -25,7 +25,7 @@ class NNBAR(object):
         # digitize
         if binning == 'simple':
             bins = np.linspace(self.sysmap.min(), self.sysmap.max(), nbins+1) 
-            self.sysl   = [0 for k in range(2*bins.size)]
+            self.sysl   = [0 for k in range(2*nbins)]
             inds = np.digitize(self.sysmap, bins)
             for i in range(1,bins.size): # what if there is nothing on the last bin? FIXME
                 self.sysl[2*i-2] = self.galmap[np.where(inds == i)].tolist()
@@ -33,10 +33,17 @@ class NNBAR(object):
         elif binning == 'equi-area':
             npts  = self.ranmap.size
             swtt  = self.ranmap.sum()/nbins  # num of randoms in each bin
-            ss, gs, ws = zip(*sorted(zip(self.sysmap, self.galmap, self.ranmap)))
+            datat = np.zeros(self.sysmap.size, dtype=np.dtype([('ss', 'f8'), ('gs', 'f8'), ('ws', 'f8'), ('rid', 'i8')]))
+            datat['ss'] = self.sysmap
+            datat['gs'] = self.galmap
+            datat['ws'] = self.ranmap
+            datat['rid'] = np.random.choice(np.arange(self.sysmap.size), size=self.sysmap.size, replace=False)
+            datas = np.sort(datat, order=['ss', 'rid'])
+            ss, gs, ws = datas['ss'], datas['gs'], datas['ws']
+            #ss, gs, ws = zip(*sorted(zip(self.sysmap, self.galmap, self.ranmap)))
             swti = 0.0
             i   = 0
-            self.sysl = [0 for k in range(2*nbins+2)] 
+            self.sysl = [0 for k in range(2*nbins)] 
             listg = []
             listr = []
             bins  = [ss[0]] # first edge is the lowest systematic
@@ -57,8 +64,8 @@ class NNBAR(object):
             bins = np.array(bins)
             print('min sys : %.2f  max sys : %.2f'%(ss[0], ss[npts-1]))
             print('num of pts : %d, num of bins : %d'%(i, j))
-        self.avnden = np.sum([np.sum(self.sysl[i]) for i in np.arange(0,2*bins.size, 2)])\
-                      /np.sum([np.sum(self.sysl[i]) for i in np.arange(1,2*bins.size, 2)])
+        self.avnden = np.sum([np.sum(self.sysl[i]) for i in np.arange(0,2*nbins, 2)])\
+                      /np.sum([np.sum(self.sysl[i]) for i in np.arange(1,2*nbins, 2)])
         self.bins = bins
         
     def run(self, njack=20):

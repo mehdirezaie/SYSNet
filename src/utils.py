@@ -49,12 +49,20 @@ def histedges_equalN(x, nbin=10, kind='size', weight=None):
                      np.arange(npt),
                      np.sort(x))
     elif kind == 'area':
+        sys.exit('FIX this routine for a repetitave x')
         npt1  = len(x)-1
         sumw = np.sum(weight) / nbin
         i    = 0
         wst  = 0.0
         xp   = [x.min()]  # lowest bin is the minimum
-        xs, ws =  zip(*sorted(zip(x, weight)))
+        #
+        #
+        datat        = np.zeros(x.size, dtype=np.dtype([('x', 'f8'), ('w', 'f8'), ('rid', 'i8')]))
+        datat['x']   = x
+        datat['w']   = weight
+        datat['rid'] = np.random.choice(np.arange(x.size), size=x.size, replace=False)
+        datas  = np.sort(datat, order=['x', 'rid'])
+        xs, ws = datas['x'], datas['w'] #zip(*sorted(zip(x, weight)))
         for wsi in ws:
             wst += wsi
             i   += 1
@@ -115,7 +123,22 @@ def clerr_jack(delta, mask, weight, njack=20, lmax=512):
     dummy = np.ones(mask.sum())
     hpixl, wl, deltal,_ = split_jackknife(hpix, weight[mask], 
                                           delta[mask], dummy, njack=njack)
+    print('# of jackknifes %d, input : %d'%(len(hpixl), njack))
     cljks = {}
+    # get the cl of the jackknife mask
+    wlt = wl.copy()
+    hpixt   = hpixl.copy()
+    wlt.pop(0)
+    hpixt.pop(0)
+    wlc = np.concatenate(wlt)
+    hpixc  = np.concatenate(hpixt)
+    maski  = np.zeros(npix, '?')
+    maski[hpixc] = True 
+    map_i  = hp.ma(maski.astype('f8'))
+    map_i.mask = np.logical_not(maski)
+    clmaskj = hp.anafast(map_i.filled(), lmax=lmax)
+    sfj = ((2*np.arange(clmaskj.size)+1)*clmaskj).sum()/(4.*np.pi) 
+
     for i in range(njack):
         hpixt   = hpixl.copy()
         wlt     = wl.copy()
@@ -139,7 +162,7 @@ def clerr_jack(delta, mask, weight, njack=20, lmax=512):
         #
         map_i       = hp.ma(deltai * wlci)
         map_i.mask  = np.logical_not(maski)
-        cljks[i]    = hp.anafast(map_i.filled(), lmax=lmax)
+        cljks[i]    = hp.anafast(map_i.filled(), lmax=lmax)/sfj
     #
     hpixt   = hpixl.copy()
     wlt     = wl.copy()
@@ -157,15 +180,20 @@ def clerr_jack(delta, mask, weight, njack=20, lmax=512):
     deltai[hpixc]  = deltac
     wlci[hpixc]    = wlc
     #
+    map_i      = hp.ma(maski.astype('f8'))
+    map_i.mask = np.logical_not(maski)
+    clmask = hp.anafast(map_i.filled(), lmax=lmax)
+    sf = ((2*np.arange(clmask.size)+1)*clmask).sum()/(4.*np.pi) 
+
     map_i       = hp.ma(deltai * wlci)
     map_i.mask  = np.logical_not(maski)
-    cljks[-1]    = hp.anafast(map_i.filled(), lmax=lmax)   # entire footprint
+    cljks[-1]   = hp.anafast(map_i.filled(), lmax=lmax)/sf   # entire footprint
     #
     clvar = np.zeros(len(cljks[-1]))
     for i in range(njack):
         clvar += (cljks[-1] - cljks[i])*(cljks[-1] - cljks[i])
     clvar *= (njack-1)/njack
-    return dict(clerr=np.sqrt(clvar), cljks=cljks)
+    return dict(clerr=np.sqrt(clvar), cljks=cljks, clmaskj=clmaskj, clmask=clmask, sf=sf, sfj=sfj)
 
 
 
@@ -211,7 +239,7 @@ def split_jackknife(hpix, weight, label, features, njack=20):
             w_l     = []
             hpix_l = []
             label_l = []
-        elif i == hpix.size-1:
+        elif (i == hpix.size-1) and (frac > 0.9*f):
             hpix_L.append(hpix_l)
             frac_L.append(frac)
             label_L.append(label_l)

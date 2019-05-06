@@ -254,6 +254,8 @@ else:
     config = None    
 config = comm.bcast(config, root=0)    
 if rank == 0:print(config)
+
+
 #
 # train batchsize
 #

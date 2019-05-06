@@ -328,9 +328,14 @@ if ns.clfile != 'none':
         delta_ngal = makedelta(galmap, ranmap, mask, select_fun=wmap)
         #
         # compute C_l
+        map_i  = hp.ma(mask.astype('f8')) 
+        map_i.mask = np.logical_not(mask) 
+        clmask = hp.anafast(map_i.filled(), lmax=ns.lmax)
+        sf = ((2*np.arange(clmask.size)+1)*clmask).sum()/(4.*np.pi)
+  
         map_ngal       = hp.ma(delta_ngal * ranmap)
         map_ngal.mask  = np.logical_not(mask)
-        cl_auto        = hp.anafast(map_ngal.filled(), lmax=ns.lmax)
+        cl_auto        = hp.anafast(map_ngal.filled(), lmax=ns.lmax) / sf
         #
         if ns.njack == 0:
             cl_err = 0.0
@@ -358,9 +363,11 @@ if ns.clfile != 'none':
         map_ngal  = None
         hpix      = None
         makedelta = None
+        sf        = None
        
     #
     # bcast
+    sf         = comm.bcast(sf, root=0)
     x          = comm.bcast(x, root=0)
     map_ngal   = comm.bcast(map_ngal, root=0)
     mask       = comm.bcast(mask, root=0)
@@ -388,7 +395,7 @@ if ns.clfile != 'none':
         map_sys      = ma(delta_sys * ranmap)
         map_sys.mask = np.logical_not(mask)
         my_cl_i      = anafast(map_ngal.filled(), map2=map_sys.filled(),\
-                               lmax=ns.lmax)
+                               lmax=ns.lmax)/sf
         my_cl.append(my_cl_i)
     #
     #
@@ -407,7 +414,7 @@ if ns.clfile != 'none':
         plt.xscale('log');plt.legend(ncol=2, bbox_to_anchor=(1.01,1.01))
         plt.ylabel(r'C$_{l}$');plt.xlabel('l')
         plt.savefig(ns.oudir + ns.clfile + '.png', bbox_inches='tight', dpi=300)
-        All_cl = dict(cross=all_cl, auto=cl_auto, clerr=cl_err, clabels=[labels[n] for n in ns.axfit])
+        All_cl = dict(cross=all_cl, auto=cl_auto, clerr=cl_err, clabels=[labels[n] for n in ns.axfit], sf=sf)
         np.save(ns.oudir  + ns.clfile, All_cl)
         log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
         fo.write(log)
@@ -429,6 +436,11 @@ if ns.clsys != 'none':
         mask2     = np.zeros_like(mask1).astype('bool')
         mask2[feat['hpind']] = True
         mask      = mask1 & mask2         # overlap 
+        # get the mask Cl
+        map_i  = hp.ma(mask.astype('f8')) 
+        map_i.mask = np.logical_not(mask) 
+        clmask = hp.anafast(map_i.filled(), lmax=ns.lmax)
+        sf = ((2*np.arange(clmask.size)+1)*clmask).sum()/(4.*np.pi)
         
         ranmap    = hp.read_map(ns.ranmap, verbose=False)
         #
@@ -447,6 +459,7 @@ if ns.clsys != 'none':
         log += '{:35s} : {}\n'.format('Total number of overlap mask', mask.sum())      
         log += '{:35s} : {}\n'.format('Compute the auto power spectra for systematics', [labels[n] for n in ns.axfit])
     else:
+        sf        = None
         x         = None
         ranmap    = None
         mask      = None
@@ -455,6 +468,7 @@ if ns.clsys != 'none':
        
     #
     # bcast
+    sf         = comm.bcast(sf, root=0)
     x          = comm.bcast(x, root=0)
     mask       = comm.bcast(mask, root=0)
     ranmap     = comm.bcast(ranmap, root=0)
@@ -480,7 +494,7 @@ if ns.clsys != 'none':
         delta_sys    = makedelta(sys_i, ranmap, mask, select_fun=None, is_sys=True)
         map_sys      = ma(delta_sys * ranmap)
         map_sys.mask = np.logical_not(mask)
-        my_cl_i      = anafast(map_sys.filled(), lmax=ns.lmax)
+        my_cl_i      = anafast(map_sys.filled(), lmax=ns.lmax) / sf
         my_cl.append(my_cl_i)
     #
     #
@@ -499,7 +513,7 @@ if ns.clsys != 'none':
         plt.xscale('log');plt.legend(ncol=2, bbox_to_anchor=(1.01,1.01))
         plt.ylabel(r'C$_{l}$');plt.xlabel('l')
         plt.savefig(ns.oudir + ns.clsys + '.png', bbox_inches='tight', dpi=300)
-        All_cl = dict(cross=all_cl, auto=None, clabels=[labels[n] for n in ns.axfit])
+        All_cl = dict(cross=all_cl, auto=None, clabels=[labels[n] for n in ns.axfit], sf=sf)
         np.save(ns.oudir  + ns.clsys, All_cl)
         log   += '{:35s} : {}\n'.format('Outpus saved under', ns.oudir)
         fo.write(log)
@@ -587,12 +601,12 @@ if ns.corfile != 'none':
     #
     my_i  = rank*my_size
     my_f  = np.minimum(x.shape[1], (rank+1)*my_size)
-    my_x  = x[:, my_i:my_f]
+    print('rank %d : start %d  end %d'%(rank, my_i, my_f))
     my_xi = []
     for i in range(my_i, my_f):
         sys_i        = np.zeros_like(ranmap)
         sys_i[hpix]  = x[:, i]
-        my_xi_i      = run_XI(None, galmap, ranmap, wmap, mask, sysm=sys_i, njack=ns.njack, Return=True)
+        my_xi_i      = run_XI(None, galmap, ranmap, wmap, mask, sysm=sys_i, njack=0, Return=True) # no jackknife for cross
         my_xi.append(my_xi_i)
     #
     #
