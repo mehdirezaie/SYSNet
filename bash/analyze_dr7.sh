@@ -48,62 +48,50 @@ clab=cp2p
 # ================ RUNS ====================
 # DATA
 # REGRESSION
-#
+
 # Feb 20: Ablation on DR7
 # mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab
 # took 50 min
 
-# Feb 21: Linear/quadratic multivariate fit on DR7 
-#         Linear/quadratic depth-z fit on DR7
+# Jun 9: Linear/quadratic multivariate fit on DR7 
 #         NN fit on DR7 with ablation
-#
+#         Run DR7 NN fit w/o ablation
 # python $multfit --input $glmp5 --output ${oudr_r}${mult1}/ --split
-# python $multfit --input $glmp5 --output ${oudr_r}${mult2}/ --split --ax 5
-# took around 10 secs
-#
-# mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
-# took 30 min on DR7
-# May 3: Run DR7 NN fit w/o ablation
+# took around 20 secs
+# ablation picks up [0, 1, 2, 7, 10, 11, 12, 14, 16, 17]
+#mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
+# took 66 min on DR7
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn3}/
+# took 66 min 
 
-# May 3: Clustering after fixing the bug in C_ell
+# fit linear with validation
+# mpirun --oversubscribe -np 5 python /Users/rezaie/github/SYSNet/src/mult_fit_vl.py --input $glmp5 --output /Volumes/TimeMachine/data/DR7/results/regression/mult_all_vl/ 
+# took 15 secs on 5 processes
+
+# run the weight footprint cut
+#python /Users/rezaie/github/SYSNet/src/make_common_mask-data.py
+# took 1 min
+
+# Jun 10: Clustering after fixing the bug in C_ell, with new weights
 # Run NNbar
 # C_l for DR7 with and w/o ablation
+# Run corr. functions
+# each takes 20 min on 4 mpi process
+# took 83 min --- turned off jackknife for the cross correlations
 #for wname in uni lin quad
 #do
-#   wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
-#   mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --clfile cl_$wname --nnbar nnbar_$wname
+#  wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#  mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --clfile cl_$wname --nnbar nnbar_$wname --corfile xi_$wname 
 #done
 #for nni in $nn1 $nn3
 #do
-#  wmap=${oudr_r}${nni}/nn-weights.hp256.fits
-#  mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --nnbar nnbar_$nni --clfile cl_$nni 
+# wmap=${oudr_r}${nni}/nn-weights.hp256.fits
+# mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --nnbar nnbar_$nni --clfile cl_$nni  --corfile xi_$nni 
 #done
-
+#mpirun --oversubscribe -np 2 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap /Volumes/TimeMachine/data/DR7/results/regression/mult_all_vl/lin-weights.hp256.fits --clfile cl_linvl 
+#
 # auto C_l for systematics
-#mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys
-
-# April 17: Run corr. functions
-# each takes 10 min on 2 mpi process
-# took 83 min --- turned off jackknife for the cross correlations
-#for wname in uni lin quad
-# do
-#    wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
-#    time mpirun --oversubscribe -np 2 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --corfile xi_$wname 
-# done
-
-#for nni in $nn3
-#do
-#  wmap=${oudr_r}${nni}/nn-weights.hp256.fits
-#  time mpirun --oversubscribe -np 2 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --corfile xi_$nni 
-#done
-
-#wmap=${oudr_r}${nn1}/nn-weights.hp256.fits
-#time mpirun --oversubscribe -np 2 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap $wmap --corfile xi_$nn1 
-# auto corr. for systematics
-#mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --corsys xi_sys
-
-
+#mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys --corsys xi_sys 
 
 
 
@@ -139,22 +127,21 @@ clab=cp2p
 
 # Lin/quadratic fit on null mocks
 # NN with ablation fit 
-# april 20: higher capacity took 865 min
 # april 26: nn wo ablation took 20 h
-# april 29: nn & lin with few maps : 0 1 2 3 10
-#for i in $(seq -f "%03g" 1 100)
-#do
-# mglmp5=${pathmock}${i}/${i}${umock5l}
-# moudr_r=${pathmock}${i}/results/regression/
-# moudr_ab=${pathmock}${i}/results/ablation/
-#echo "fit on $mglmp5"
-# python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
+# april 29: nn & lin with few maps : 0 1 2 3 8
+for i in $(seq -f "%03g" 1 100)
+do
+ mglmp5=${pathmock}${i}/${i}${umock5l}
+ moudr_r=${pathmock}${i}/results/regression/
+ moudr_ab=${pathmock}${i}/results/ablation/
+ echo "fit on $mglmp5"
+ python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
+ mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
 # mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn2}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
-# python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --split --ax 0 1 2 3 10
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 10
-#done
+ mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
+ python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --split --ax 0 1 2 3 8
+ mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 8 
+done
 # took 4 h
 #
 # Clustering
@@ -214,19 +201,19 @@ clab=cp2p
 #   mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab
 #done
 
-#for i in $(seq -f "%03g" 1 100)
-#do
-# mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
-# moudr_r=${pathmock}${i}/$clab/results/regression/
-# moudr_ab=${pathmock}${i}/$clab/results/ablation/
-# echo "fit on $mglmp5"
-# python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
+for i in $(seq -f "%03g" 1 100)
+do
+ mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
+ moudr_r=${pathmock}${i}/$clab/results/regression/
+ moudr_ab=${pathmock}${i}/$clab/results/ablation/
+ echo "fit on $mglmp5"
+ python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
+ mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
 # mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn2}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
-# python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --ax 0 1 2 3 10
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 10
-#done
+ mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
+ python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --ax 0 1 2 3 8
+ mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 8
+done
 # fit the true contamination model on the contaminated data
 #for i in $(seq -f "%03g" 1 100)
 #do
@@ -234,7 +221,7 @@ clab=cp2p
 # moudr_r=${pathmock}${i}/$clab/results/regression/
 # echo "fit on $mglmp5"
 # python $multfit --input $mglmp5 --output ${moudr_r}${mult3}/ --split --ax 0 1 2 7 10 11 12 14 16 17
-# mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
+## mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
 # moudr_c=${pathmock}${i}/$clab/results/clustering/
 # wmap=${moudr_r}${mult3}/lin-weights.hp256.fits
 # clnm=cl_lin_ab
@@ -300,8 +287,8 @@ clab=cp2p
 # python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
 # 
  
- #
- # nn weights
+#
+# nn weights
 # for nni in $nn1 $nn2 $nn3 $nn4
 #  do
 #  wmap=${moudr_r}${nni}/nn-weights.hp256.fits

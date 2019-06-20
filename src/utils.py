@@ -35,7 +35,47 @@ try:
 except:
     print('healpy is not installed')
     
+from scipy.stats import binned_statistic
 
+def binit(el, cel, bins=np.logspace(0, 2.71, 10)):
+    '''
+        bin the C_ell measurements
+    '''
+    kw  = dict(bins=bins, statistic='sum')
+    lb  = 0.5*(bins[1:]+bins[:-1])
+    a2l = 2*el + 1
+    clwt,_,_ = binned_statistic(el, a2l*cel, **kw)
+    wt,_,_   = binned_statistic(el, a2l, **kw)
+    #print(clwt, wt)
+    return lb, clwt/wt
+
+def moderr(el, cel, bins=np.logspace(0, 2.71, 10), fsky=1.0):
+    '''
+        get the mode counting error estimate
+    '''
+    kw  = dict(bins=bins, statistic='sum')
+    lb  = 0.5*(bins[1:]+bins[:-1])
+    a2l = 2*el + 1
+    clwt,_,_ = binned_statistic(el, a2l*cel, **kw)
+    wt,_,_   = binned_statistic(el, a2l, **kw)
+    #print(clwt, wt)
+    return lb, (clwt/wt)/(np.sqrt(0.5*fsky*wt))
+
+def binit_jac(cljks):
+    '''
+        Bin jackknife C_ell measurements and get the error estimate
+    '''
+    el = np.arange(cljks[0].size)
+    cbljks = []
+    for i in range(20):
+        elb, clb = binit(el, cljks[i])
+        cbljks.append(clb)
+    elb, clm = binit(el, cljks[-1])
+    clvar = np.zeros(clm.size)
+    for i in range(20):
+        clvar += (clm - cbljks[i])*(clm - cbljks[i])
+    clvar *= (19)/20
+    return elb, np.sqrt(clvar)
     
 def histedges_equalN(x, nbin=10, kind='size', weight=None):
     '''

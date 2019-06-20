@@ -53,7 +53,7 @@ class Netregression(object):
     def train_evaluate(self, learning_rate=0.001,
                        batchsize=100, nepoch=10, nchain=5,
                       Units=[10,10], tol=1.e-5, scale=0.0,
-                       actfunc=tf.nn.relu):
+                       actfunc=tf.nn.relu, patience=10):
         #
         #from tensorflow.python.framework import ops
 
@@ -175,6 +175,8 @@ class Netregression(object):
             optimizer   = tf.train.AdamOptimizer(learning_rate)
             train_step  = optimizer.minimize(mse_w_l2, global_step=global_step)            
             #print('chain ',ii)
+            mse_min = 10000000.
+            last_improvement = 0
             mse_list = []
             # 
             # initialize the NN
@@ -193,10 +195,16 @@ class Netregression(object):
                 mse_list.append([i, train_loss, valid_loss])
                 #mse_list.append([i, train_loss, valid_loss, test_loss])  # to save test MSE
                 #
-                if i >= 6:
-                    if np.abs(valid_loss-mse_list[-5][2]) < tol:
-                        print('chain {} stopping at {}'.format(ii,i))
-                        break # stop training by early stopping
+                #  Early Stopping
+                if (valid_loss/mse_min -1.0) < tol:
+                    mse_min = valid_loss
+                    last_improvement = 0
+                else:
+                    last_improvement += 1
+                
+                if last_improvement > patience:
+                    print("No improvement found during the {} last iterations at {}, stopping optimization!!".format(patience, i))
+                    break # stop training by early stopping
                 for k in range(nep): # loop on training unpdates
                     ji = k*batchsize
                     jj = np.minimum((k+1)*batchsize, train_size)                    
