@@ -25,7 +25,6 @@ mult3=mult_ab
 mult4=mult_f
 log_ab=dr7.log
 nn1=nn_ab
-nn2=nn_abh
 nn3=nn_p
 nn4=nn_f
 
@@ -49,9 +48,13 @@ clab=cp2p
 # DATA
 # REGRESSION
 
-# Feb 20: Ablation on DR7
-# mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab
-# took 50 min
+# Jun 21: Ablation on DR7
+# took 18 min
+# for rk in 0 1 2 3 4
+# do
+#   time mpirun --oversubscribe -np 5 python $ablation --data $glmp5 --output $oudr_ab --log $log_ab --rank $rk
+# done
+
 
 # Jun 9: Linear/quadratic multivariate fit on DR7 
 #         NN fit on DR7 with ablation
@@ -59,25 +62,24 @@ clab=cp2p
 # python $multfit --input $glmp5 --output ${oudr_r}${mult1}/ --split
 # took around 20 secs
 # ablation picks up [0, 1, 2, 7, 10, 11, 12, 14, 16, 17]
-#mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}.npy
-# took 66 min on DR7
+#mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn3}/
-# took 66 min 
+# took 75 min
 
 # fit linear with validation
 # mpirun --oversubscribe -np 5 python /Users/rezaie/github/SYSNet/src/mult_fit_vl.py --input $glmp5 --output /Volumes/TimeMachine/data/DR7/results/regression/mult_all_vl/ 
 # took 15 secs on 5 processes
 
 # run the weight footprint cut
-#python /Users/rezaie/github/SYSNet/src/make_common_mask-data.py
+# python /Users/rezaie/github/SYSNet/src/make_common_mask-data.py
 # took 1 min
-
+#
 # Jun 10: Clustering after fixing the bug in C_ell, with new weights
 # Run NNbar
 # C_l for DR7 with and w/o ablation
 # Run corr. functions
 # each takes 20 min on 4 mpi process
-# took 83 min --- turned off jackknife for the cross correlations
+# took 112 m
 #for wname in uni lin quad
 #do
 #  wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
@@ -115,41 +117,50 @@ clab=cp2p
 
 
 # Ablation on mocks
+# took 2465 m for cont. and null mocks
 #for i in $(seq -f "%03g" 1 100)
 #do
 #   mglmp5=${pathmock}${i}/${i}${umock5l}
 #   moudr_ab=${pathmock}${i}/results/ablation/
 #   echo "ablation on $mglmp5"
-#   mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab
+#   for rk in 0 1 2 3 4
+#   do
+#     mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab --rank $rk
+#   done
 #done
-# took 45 hours
 
 
 # Lin/quadratic fit on null mocks
 # NN with ablation fit 
-# april 26: nn wo ablation took 20 h
-# april 29: nn & lin with few maps : 0 1 2 3 8
-for i in $(seq -f "%03g" 1 100)
-do
- mglmp5=${pathmock}${i}/${i}${umock5l}
- moudr_r=${pathmock}${i}/results/regression/
- moudr_ab=${pathmock}${i}/results/ablation/
- echo "fit on $mglmp5"
- python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
- mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn2}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
- mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
- python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --split --ax 0 1 2 3 8
- mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 8 
-done
-# took 4 h
+# June 27
+# nn wo ablation
+# nn & lin with few maps : 0 1 2 3 8
+#for i in $(seq -f "%03g" 1 100)
+#do
+# mglmp5=${pathmock}${i}/${i}${umock5l}
+# moudr_r=${pathmock}${i}/results/regression/
+# moudr_ab=${pathmock}${i}/results/ablation/
+# echo "fit on $mglmp5"
+# python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
+# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}
+# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
+# python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --split --ax 0 1 2 3 8
+# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 8 
+#done
+
+# find common mask between cont. and null mocks
+#python src/make_common_mask.py
+#total number of weights : 1400
+#real    2m32.280s
+#user    7m5.730s
+#sys     0m27.353s
+
+
 #
 # Clustering
 # Use the median to upweight galaxies
-# april 22: use a nn with higher capacity
-# april 27: nn w/o ablation took 139 m
-# may 2: clustering after fixing the footprint effect 15 h 
-#
+# July 1: clustering after ablation and hp training for each fold
+# 745 min
 #for i in $(seq -f "%03g" 1 100)
 #do
 #   mglmp=${pathmock}${i}/${i}${umockl}
@@ -160,65 +171,62 @@ done
 #   do
 #     wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
 #     clnm=cl_${multw}
-#     echo "clustering on $mglmp w $wmap"
-#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0 
 #     nnnm=nnbar_${multw}
-#     echo "nnbar on $mglmp w $wmap"
-#     python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
+#     echo "clustering & nbar on $mglmp w $wmap"
+#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0 
 #   done
 #   multw=$mult4
 #   wmap=${moudr_r}${mult4}/lin-weights.hp256.fits
 #   clnm=cl_${multw}
-#   echo "clustering on $mglmp w $wmap"
-#   mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0 
 #   nnnm=nnbar_${multw}
-#   echo "nnbar on $mglmp w $wmap"
-#   python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
+#   echo "clustering & nbar on $mglmp w $wmap"
+#   mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0 
 #   # nn weights
-#   for nni in $nn1 $nn2 $nn3 $nn4
+#   for nni in $nn1 $nn3 $nn4
 #    do
 #     wmap=${moudr_r}${nni}/nn-weights.hp256.fits
 #     clnm=cl_$nni
 #     nnnm=nnbar_${nni}
-#     echo "clustering on $mglmp w $wmap"
-#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0 
-#     echo "nnbar on $mglmp w $wmap"
-#     python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0 
+#     echo "clustering & nbar on $mglmp w $wmap"
+#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0 
 #  done
 #done
-#
-
-
 
 #
 # Contaminated
-
+#
 #for i in $(seq -f "%03g" 1 100)
 #do
 #   mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
 #   moudr_ab=${pathmock}${i}/$clab/results/ablation/
 #   echo "ablation on $mglmp5"
-#   mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab
+#   for rk in 0 1 2 3 4
+#   do 
+#      mpirun --oversubscribe -np 5 python $ablation --data $mglmp5 --output ${moudr_ab} --log ${i}.$mlog_ab --rank $rk
+#   done
 #done
-
-for i in $(seq -f "%03g" 1 100)
-do
- mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
- moudr_r=${pathmock}${i}/$clab/results/regression/
- moudr_ab=${pathmock}${i}/$clab/results/ablation/
- echo "fit on $mglmp5"
- python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
- mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
-# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn2}/ --ablog ${moudr_ab}${i}.${mlog_ab}.npy
- mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
- python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --ax 0 1 2 3 8
- mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 8
-done
-# fit the true contamination model on the contaminated data
+#
 #for i in $(seq -f "%03g" 1 100)
 #do
 # mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
 # moudr_r=${pathmock}${i}/$clab/results/regression/
+# moudr_ab=${pathmock}${i}/$clab/results/ablation/
+# echo "fit on $mglmp5"
+# python $multfit --input $mglmp5 --output ${moudr_r}${mult1}/ --split
+# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn1}/ --ablog ${moudr_ab}${i}.${mlog_ab}
+# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn3}/ 
+# python $multfit --input $mglmp5 --output ${moudr_r}${mult4}/ --split --ax 0 1 2 3 8
+# mpirun --oversubscribe -np 5 python $nnfit --input $mglmp5 --output ${moudr_r}${nn4}/ --ax 0 1 2 3 8
+#done
+
+
+#
+# we drop this for the paper
+# fit the true contamination model on the contaminated data
+#for i in $(seq -f "%03g" 1 100)
+#do
+# mglmp5=${pathmock}${i}/$clab/${clab}_${i}${umock5l}
+## moudr_r=${pathmock}${i}/$clab/results/regression/
 # echo "fit on $mglmp5"
 # python $multfit --input $mglmp5 --output ${moudr_r}${mult3}/ --split --ax 0 1 2 7 10 11 12 14 16 17
 ## mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
@@ -239,37 +247,32 @@ done
 
 
 #
-# May 2 : clustering after fixing the footprint normalization
 #for i in $(seq -f "%03g" 1 100)
 #do
-#   mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
-#   moudr_r=${pathmock}${i}/$clab/results/regression/
-#   moudr_c=${pathmock}${i}/$clab/results/clustering/
+#  mglmp=${pathmock}${i}/$clab/${clab}_${i}${umockl}
+#  moudr_r=${pathmock}${i}/$clab/results/regression/
+#  moudr_c=${pathmock}${i}/$clab/results/clustering/
 #  #
-  #   no weight - lin - weight
+#  #   no weight - lin - weight
 #  for multw in uni lin quad
 #  do
 #     wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
 #     clnm=cl_${multw}
-#     echo "clustering on $mglmp w $wmap"
-#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0
 #     nnnm=nnbar_${multw}
-#     echo "nnbar on $mglmp w $wmap"
-#     python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
+#     echo "clustering & nbar on $mglmp w $wmap"
+#     mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
 #  done
 #  # linear with few maps
 # multw=$mult4
 # wmap=${moudr_r}${mult4}/lin-weights.hp256.fits
 # clnm=cl_${multw}
-# echo "clustering on $mglmp w $wmap"
-# mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0
 # nnnm=nnbar_${multw} 
-# echo "nnbar on $mglmp w $wmap"
-# python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
-# #
-# # fit truth linear
-#  wmap=${moudr_r}${mult3}/lin-weights.hp256.fits
-#  clnm=cl_lin_ab
+# echo "clustering & nbar on $mglmp w $wmap"
+# mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
+ # We do not do this for the paper
+ # fit truth linear
+ #wmap=${moudr_r}${mult3}/lin-weights.hp256.fits
+ #clnm=cl_lin_ab
 #  echo "clustering on $mglmp w $wmap"
 #  mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0
 #   nnnm=nnbar_lin_ab
@@ -278,25 +281,31 @@ done
 #
  #
  # linear truth
-#  wmap=${oudr_r}${mult3}/lin-weights.hp256.fits
-#  clnm=cl_truth
-# echo "clustering on $mglmp w $wmap"
-# mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 0
+ #wmap=${oudr_r}${mult3}/lin-weights.hp256.fits
+# clnm=cl_truth
 # nnnm=nnbar_truth
-# echo "nnbar on $mglmp w $wmap"
-# python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
-# 
- 
-#
+#echo "clustering & nbar on $mglmp w $wmap"
+#mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0
 # nn weights
-# for nni in $nn1 $nn2 $nn3 $nn4
+# for nni in $nn1 $nn3 $nn4
 #  do
 #  wmap=${moudr_r}${nni}/nn-weights.hp256.fits
 #  clnm=cl_$nni
 #  nnnm=nnbar_${nni}
-#  echo "clustering on $mglmp w $wmap"
-#  mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose  --njack 0
-#  echo "nnbar on $mglmp w $wmap"
-#  python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --nnbar ${nnnm} --oudir ${moudr_c} --verbose --njack 0 
-#  done
+#  echo "clustering & nbar on $mglmp w $wmap"
+#  mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --nnbar ${nnnm} --oudir ${moudr_c} --verbose  --njack 0
+# done
 #done
+
+# one mock with Jackknife
+i=001
+mglmp=${pathmock}${i}/${i}${umockl}
+moudr_r=${pathmock}${i}/results/regression/
+moudr_c=${pathmock}${i}/results/clustering/
+multw=uni_wjack
+wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
+clnm=cl_${multw}
+echo "clustering on $mglmp w $wmap"
+mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 20
+
+

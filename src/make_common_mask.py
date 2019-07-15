@@ -31,14 +31,14 @@ weights  = glob('/Volumes/TimeMachine/data/mocks/3dbox/*/results/regression/*/*w
 weights += glob('/Volumes/TimeMachine/data/mocks/3dbox/*/cp2p/results/regression/*/*weights.hp256.fits')
 print('total number of weights : %d'%len(weights))
 
-
 mask = hp.read_map(filename, verbose=False).astype('bool')
 for n in weights:
     wi = hp.read_map(n, verbose=False)
     maski = (wi > 0.5) & (wi < 2.0)
     mask &= maski   
 
-# hp.write_map(filename2, mask, overwrite=True, fits_IDL=False)
+hp.write_map(filename2, mask, overwrite=True, fits_IDL=False)
 
-mask2 = hp.read_map(filename2, verbose=False).astype('bool')
-print(mask.sum(), mask2.sum(), np.array_equal(mask, mask2))
+# test
+#mask2 = hp.read_map(filename2, verbose=False).astype('bool')
+#print(mask.sum(), mask2.sum(), np.array_equal(mask, mask2))

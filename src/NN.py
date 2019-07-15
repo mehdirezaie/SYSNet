@@ -196,14 +196,15 @@ class Netregression(object):
                 #mse_list.append([i, train_loss, valid_loss, test_loss])  # to save test MSE
                 #
                 #  Early Stopping
-                if (valid_loss/mse_min -1.0) < tol:
+                if (np.abs(valid_loss/mse_min -1.0) > tol) and (valid_loss < mse_min):
                     mse_min = valid_loss
                     last_improvement = 0
                 else:
                     last_improvement += 1
                 
                 if last_improvement > patience:
-                    print("No improvement found during the {} last iterations at {}, stopping optimization!!".format(patience, i))
+                    #print("No improvement found during the {} last iterations at {}, stopping optimization!!".format(patience, i))
+                    print("stopping at {}".format(i))
                     break # stop training by early stopping
                 for k in range(nep): # loop on training unpdates
                     ji = k*batchsize

@@ -10,8 +10,8 @@ from   time import time
 
 
 #
-CONFIG = dict(nchain=3, batchsize=1024,
-              nepoch=200, Units=[0], tol=0.0, 
+CONFIG = dict(nchain=1, batchsize=1024,
+              nepoch=500, Units=[0], tol=1.e-4, 
               learning_rate=0.001, scale=0.0)
 # 
 def fix(data, ax=list(range(18))):
@@ -68,13 +68,15 @@ if rank == 0:
     ap.add_argument('--output', default='../data/mocks/mocks5folds/test_ablation/')
     ap.add_argument('--rmses', default='ablation_rmse')
     ap.add_argument('--log', default='seed100.log')
+    ap.add_argument('--rank', default='0')
     ns = ap.parse_args()
     INDICES  = [i for i in range(ns.index[0], ns.index[1])]
     #
+    foldname = 'fold'+ns.rank
     data = np.load(ns.data).item()
-    train = data['train']['fold0']
-    test  = data['test']['fold0']
-    valid = data['validation']['fold0']
+    train = data['train'][foldname]
+    test  = data['test'][foldname]
+    valid = data['validation'][foldname]
     import os 
     if not os.path.exists(ns.output):
         print('creating ... ', ns.output)
@@ -82,10 +84,11 @@ if rank == 0:
     del data
     LOGS = {'validmin':[], 'importance':[], 'indices':[]}
 else:
-    INDICES = None
-    train  = None
-    test   = None
-    valid  = None
+    INDICES  = None
+    train    = None
+    test     = None
+    foldname = None
+    valid    = None
 
     
 # bcast FILES
@@ -93,6 +96,7 @@ INDICES = comm.bcast(INDICES, root=0)
 train   = comm.bcast(train, root=0)
 test    = comm.bcast(test, root=0)
 valid   = comm.bcast(valid, root=0)
+foldname =comm.bcast(foldname, root=0)
 
 # for filei in my_chunk:
 #     print(filei.split('/')[-1])
@@ -122,9 +126,10 @@ while len(INDICES_temp) > 1:
             rmse.append(np.sqrt(a[2][:,2]))
         RMSE  = np.column_stack(rmse)
         RMSEm = np.mean(RMSE, axis=1)
-        RMSEe = np.std(RMSE, axis=1)/np.sqrt(RMSE.shape[1])
+        #RMSEe = np.std(RMSE, axis=1)/np.sqrt(RMSE.shape[1])
         baseline = np.sqrt(net.optionsdic['baselineMSE'][1])
-        valid_rmse.append([net.epoch_MSEs[0][2][:,0], RMSEm/baseline, RMSEe/baseline])
+        #valid_rmse.append([net.epoch_MSEs[0][2][:,0], RMSEm/baseline, RMSEe/baseline])
+        valid_rmse.append([net.epoch_MSEs[0][2][:,0], RMSEm/baseline])
         validmin.append([np.min(RMSEm)])
         print('{} is done in {} s'.format(j, time()-t1))
         del rmse
@@ -133,7 +138,6 @@ while len(INDICES_temp) > 1:
         del test_2
         del All
         del RMSE
-        del RMSEe
         del RMSEm
         del net
      
@@ -146,7 +150,7 @@ while len(INDICES_temp) > 1:
     if rank ==0:
         validmin = [validj for validi in validmin for validj in validi]
         arg      = np.argmin(validmin)
-        np.save(ns.output+ns.rmses+str(INDICES_temp[arg]), valid_rmse)
+        np.save(ns.output+ns.rmses+str(INDICES_temp[arg])+'_'+foldname, valid_rmse)
         LOGS['validmin'].append(validmin)
         #print('valid mins are : {}'.format(validmin))
         print('removing {}th systematic'.format(INDICES_temp[arg]))
@@ -167,10 +171,11 @@ if rank == 0:
         rmse.append(np.sqrt(a[2][:,2]))
     RMSE  = np.column_stack(rmse)
     RMSEm = np.mean(RMSE, axis=1)
-    RMSEe = np.std(RMSE, axis=1)/np.sqrt(RMSE.shape[1])
+    #RMSEe = np.std(RMSE, axis=1)/np.sqrt(RMSE.shape[1])
     baseline = np.sqrt(net.optionsdic['baselineMSE'][1])
-    valid_rmse = [net.epoch_MSEs[0][2][:,0], RMSEm/baseline, RMSEe/baseline]
+    #valid_rmse = [net.epoch_MSEs[0][2][:,0], RMSEm/baseline, RMSEe/baseline]
+    valid_rmse = [net.epoch_MSEs[0][2][:,0], RMSEm/baseline]
     LOGS['RMSEall'] = np.min(RMSEm)
     LOGS['baselineRMSE'] = baseline
-    np.save(ns.output + ns.log, LOGS)
-    np.save(ns.output + ns.rmses+ '_all', valid_rmse)
+    np.save(ns.output + ns.log +'_'+foldname, LOGS)
+    np.save(ns.output + ns.rmses+ '_all'+'_'+foldname, valid_rmse)

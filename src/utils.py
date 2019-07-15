@@ -4,7 +4,7 @@
    cosmological quantities
 
    (c) Mehdi Rezaie medirz90@icloud.com
-   Last update: 10/10/2017
+   Last update: Jun 23, 2019
 
 """
 import os
@@ -738,7 +738,31 @@ def apply_tycho(objgal, galtype='LRG',dirt='/global/cscratch1/sd/mehdi/tycho2.fi
     objgal = rfn.append_fields(objgal, ['tychoveto'], data=[tychomask], dtypes=tychomask.dtype, usemask=False)
     return objgal
 
-
+# def getcf(d):
+#     # cut input maps based on PCC
+#     from scipy.stats import pearsonr
+#     # lbl = ['ebv', 'nstar'] + [''.join((s, b)) for s in ['depth', 'seeing', 'airmass', 'skymag', 'exptime'] for b in 'rgz']
+#     cflist = []
+#     indices = []
+#     for i in range(d['train']['fold0']['features'].shape[1]):
+#         for j in range(5):
+#             fold = ''.join(['fold', str(j)])
+#             cf = pearsonr(d['train'][fold]['label'], d['train'][fold]['features'][:,i])[0]
+#             if np.abs(cf) >= 0.02:
+#                 #print('{:s} : sys_i: {} : cf : {:.4f}'.format(fold, lbl[i], cf))
+#                 indices.append(i)
+#                 cflist.append(cf)
+#     if len(indices) > 0:
+#         indices = np.unique(np.array(indices))
+#         return indices
+#     else:
+#         print('no significant features')
+#         return None
+#     cf = []
+#     indices = []
+#     for i in range(features.shape[1]):
+#         cf.append(pearsonr(label, features[:,i]))
+#         if np.abs(cf) > 0.0
 # def change_coord(m, coord):
 #     """ Change coordinates of a HEALPIX map
 #     (c) dPol

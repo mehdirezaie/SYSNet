@@ -27,16 +27,17 @@ print('total number of weights %d'%len(weights))
 print('plain footprint %d'%mask.sum())
 print('saving %s'%filename)
 
+
 #map : /Volumes/TimeMachine/data/DR7/results/regression/mult_all/lin-weights.hp256.fits  187257 187251
 #map : /Volumes/TimeMachine/data/DR7/results/regression/mult_all/quad-weights.hp256.fits  187251 187114
 #map : /Volumes/TimeMachine/data/DR7/results/regression/mult_all_vl/lin-weights.hp256.fits  187108 187251
-#map : /Volumes/TimeMachine/data/DR7/results/regression/nn_ab/nn-weights.hp256.fits  187108 186724
-#map : /Volumes/TimeMachine/data/DR7/results/regression/nn_p/nn-weights.hp256.fits  186702 185883
+#map : /Volumes/TimeMachine/data/DR7/results/regression/nn_ab/nn-weights.hp256.fits  187108 186403
+#map : /Volumes/TimeMachine/data/DR7/results/regression/nn_p/nn-weights.hp256.fits  186385 185914
 #total number of weights 5
-#plain footprint 185794
+#plain footprint 185781
 #saving /Volumes/TimeMachine/data/DR7/mask.cut.hp.256.fits
 #
-#real    0m8.744s
-#user    0m2.076s
-#sys     0m0.282s
+#real    0m10.265s
+#user    0m2.066s
+#sys     0m0.296s
 
