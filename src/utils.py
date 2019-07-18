@@ -37,10 +37,12 @@ except:
     
 from scipy.stats import binned_statistic
 
-def binit(el, cel, bins=np.logspace(0, 2.71, 10)):
+def binit(el, cel, bins=None):
     '''
         bin the C_ell measurements
     '''
+    if bins is None:
+        bins = np.logspace(0, 2.71, 10)
     kw  = dict(bins=bins, statistic='sum')
     lb  = 0.5*(bins[1:]+bins[:-1])
     a2l = 2*el + 1
@@ -61,20 +63,20 @@ def moderr(el, cel, bins=np.logspace(0, 2.71, 10), fsky=1.0):
     #print(clwt, wt)
     return lb, (clwt/wt)/(np.sqrt(0.5*fsky*wt))
 
-def binit_jac(cljks):
+def binit_jac(cljks, bins=None, njacks=20):
     '''
         Bin jackknife C_ell measurements and get the error estimate
     '''
     el = np.arange(cljks[0].size)
     cbljks = []
-    for i in range(20):
-        elb, clb = binit(el, cljks[i])
+    for i in range(njacks):
+        elb, clb = binit(el, cljks[i], bins=bins)
         cbljks.append(clb)
-    elb, clm = binit(el, cljks[-1])
+    elb, clm = binit(el, cljks[-1], bins=bins)
     clvar = np.zeros(clm.size)
-    for i in range(20):
+    for i in range(njacks):
         clvar += (clm - cbljks[i])*(clm - cbljks[i])
-    clvar *= (19)/20
+    clvar *= (njacks-1)/njacks
     return elb, np.sqrt(clvar)
     
 def histedges_equalN(x, nbin=10, kind='size', weight=None):
