@@ -62,7 +62,8 @@ if rank == 0:
     from glob import glob
     from argparse import ArgumentParser
     ap = ArgumentParser(description='Run paircounts on mocks')
-    ap.add_argument('--index', nargs='*', type=int, default=[0,18])
+    ap.add_argument('--axfit',  nargs='*',   type=int,\
+                                    default=[i for i in range(18)])    
     ap.add_argument('--data', default='../data/mocks/mocks5folds/'\
                     +'3dbox_nmesh1024_L5274.0_bias1.5_seed100hp256-ngal-featurs5fold.fits.npy')
     ap.add_argument('--output', default='../data/mocks/mocks5folds/test_ablation/')
@@ -70,7 +71,7 @@ if rank == 0:
     ap.add_argument('--log', default='seed100.log')
     ap.add_argument('--rank', default='0')
     ns = ap.parse_args()
-    INDICES  = [i for i in range(ns.index[0], ns.index[1])]
+    INDICES  = ns.axfit
     #
     foldname = 'fold'+ns.rank
     data = np.load(ns.data).item()

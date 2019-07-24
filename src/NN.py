@@ -76,6 +76,13 @@ class Netregression(object):
         stdX       = np.std(train.X, axis=0)
         meanY      = np.mean(train.Y, axis=0)
         stdY       = np.std(train.Y, axis=0)
+        #
+        # convert 0 stds to 1.0s
+        assert np.all(stdX != 0.0)
+        assert (stdY != 0.0)        
+        #stdX[stdX==0.0] = 1.0
+
+        
         self.Xstat = (meanX, stdX)
         self.Ystat = (meanY, stdY)
         

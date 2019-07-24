@@ -14,7 +14,7 @@ class mock(object):
         # attrs
         self.hpix   = feats['hpind']
         self.feats  = feats['features']
-        self.ax     = params['ax']
+        self.axfit     = params['axfit']
         self.xstats = params['xstats']
         #print('Will scale the covariance by %.4f'%sf)
         bfp_raw     = params['params'][func]
@@ -24,7 +24,7 @@ class mock(object):
         # prepare
         self.n   = self.feats.shape[0]
         x        = (self.feats - self.xstats[0])/self.xstats[1] # select axis
-        x_scaled = x[:, self.ax]
+        x_scaled = x[:, self.axfit]
         if func == 'lin':
             x_vector = np.column_stack([np.ones(self.n), x_scaled])
         elif func == 'quad':

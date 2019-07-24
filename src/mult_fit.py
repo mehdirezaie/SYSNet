@@ -20,8 +20,8 @@ def lin(x, *theta):
     return theta[0] + np.matmul(x, np.array(theta[1:]))
 
 class DATA(object):
-    def __init__(self, INPUT, ax=list(range(18)), OUTPUT='./dr5linquadfit', split=False):
-        self.ax = ax
+    def __init__(self, INPUT, axfit=list(range(18)), OUTPUT='./dr5linquadfit', split=False):
+        self.axfit = axfit
         if split:
             datai = np.load(INPUT).item()
             data  = np.concatenate([datai['test']['fold'+str(i)] for i in range(5)])
@@ -30,11 +30,11 @@ class DATA(object):
         self.hpix = data['hpind']
         self.XSTATS = (np.mean(data['features'], axis=0), np.std(data['features'], axis=0))
         self.f = (data['features']-self.XSTATS[0])/self.XSTATS[1]
-        if len(ax)==1:
-            self.X = self.f[:,self.ax]#.squeeze()
+        if len(axfit)==1:
+            self.X = self.f[:,self.axfit]#.squeeze()
             self.XX = np.concatenate([self.X, self.X*self.X], axis=1)
         else:
-            self.X = self.f[:,self.ax]
+            self.X = self.f[:,self.axfit]
             self.XX = np.concatenate([self.X, self.X*self.X], axis=1)
         #self.Y  = data['label']/np.average(data['label'], weights=data['fracgood'])
         self.Y  = data['label']
@@ -42,11 +42,11 @@ class DATA(object):
         log  = '! ---- Fit a linear/quadratic multivariate to data ------\n'
         log += 'reading {} \n'.format(INPUT)
         log += 'number of data : {} Number of systematic maps : {}\n'.format(*data['features'].shape)
-        log += 'feature indices to be used : {}\n'.format(ax)
-        popt, pcov = curve_fit(quad, self.XX, self.Y, p0=[0 for i in range(2*len(ax)+1)],
+        log += 'feature indices to be used : {}\n'.format(axfit)
+        popt, pcov = curve_fit(quad, self.XX, self.Y, p0=[0 for i in range(2*len(axfit)+1)],
                                  sigma=self.Ye, method='lm', absolute_sigma=True)
         self.quad  = (popt, pcov)
-        popt, pcov = curve_fit(lin, self.X, self.Y, p0=[0 for i in range(len(ax)+1)],
+        popt, pcov = curve_fit(lin, self.X, self.Y, p0=[0 for i in range(len(axfit)+1)],
                                  sigma=self.Ye, method='lm', absolute_sigma=True)
         self.lin   = (popt, pcov)
         rmse = lambda y1, y2, noise: np.sqrt(np.mean(((y1-y2)/noise)**2))
@@ -62,7 +62,7 @@ class DATA(object):
         log += 'write results on {}'.format(OUTPUT)
         oudata = {'rmses':[rmse_baseline, rmse_lin, rmse_quad], 'log':log,
                   'params':{'lin':self.lin, 'quad':self.quad}, 'baseline':baseline_model,
-                  'xstats':self.XSTATS, 'ax':self.ax}
+                  'xstats':self.XSTATS, 'axfit':self.axfit}
         np.save(OUTPUT, oudata)
         print(log) # show results
         
@@ -72,7 +72,7 @@ class DATA(object):
         print('plotting bfit plot under {}'.format(path4png))
         c = ['cornflowerblue','crimson']
         self.LABELS = ['EBV', 'logHI', 'NStar']+[l+s for l in ['depth','seeing','skymag','exptime', 'mjd'] for s in 'rgz']
-        labels = [self.LABELS[i] for i in self.ax]
+        labels = [self.LABELS[i] for i in self.axfit]
         f = plt.figure(figsize=(10,5))
         plt.subplots_adjust(hspace=0.1)
         gs  = gridspec.GridSpec(2, 1, height_ratios=[1, 4])
@@ -94,7 +94,7 @@ class DATA(object):
         #ax1.grid()
         ax2.spines['top'].set_visible(False)
         ax2.spines['right'].set_visible(False)
-        plt.xticks(np.arange(2*len(self.ax)+1), ['b']+[l+s for s in ['','$^{2}$'] for l in labels], rotation=90)
+        plt.xticks(np.arange(2*len(self.axfit)+1), ['b']+[l+s for s in ['','$^{2}$'] for l in labels], rotation=90)
         ax2.errorbar(np.arange(len(self.lin[0])), self.lin[0], np.diag(self.lin[1])**0.5,
                      marker='.', color=c[1], ls='-')
         ax2.errorbar(np.arange(len(self.quad[0])), self.quad[0], np.diag(self.quad[1])**0.5,
@@ -151,26 +151,27 @@ class DATA(object):
         for j,(c,l) in enumerate(zip(c, ['DR5 data', 'linear-fit', 'quadratic-fit'])):
             a[0].text(0.5, 0.94-j*0.06, l, color=c, transform=a[0].transAxes)
         plt.savefig(path4nnbar, bbox_inches='tight', dpi=300)
-    def savemodels(self, path4models):
-        print('saving  '+path4models+'lin-weights.hp256.fits')
-        print('saving  '+path4models+'quad-weights.hp256.fits')
+    def savemodels(self, path4models, nside=256):
+        print('saving  '+path4models+'lin-weights.hp'+str(nside)+'.fits')
+        print('saving  '+path4models+'quad-weights.hp'+str(nside)+'.fits')
         import healpy as hp
         lin_model  = lin(self.X, *self.lin[0])
         quad_model = quad(self.XX, *self.quad[0])
-        mapi = np.zeros(12*256**2)
+        mapi = np.zeros(12*nside**2)
         mapi[self.hpix] = lin_model
-        hp.write_map(path4models+'lin-weights.hp256.fits', mapi, fits_IDL=False, dtype=np.float64, overwrite=True)
-        mapj = np.zeros(12*256**2)
+        hp.write_map(path4models+'lin-weights.hp'+str(nside)+'.fits', mapi, fits_IDL=False, dtype=np.float64, overwrite=True)
+        mapj = np.zeros(12*nside**2)
         mapj[self.hpix] = quad_model
-        hp.write_map(path4models+'quad-weights.hp256.fits', mapj, fits_IDL=False, dtype=np.float64, overwrite=True)
+        hp.write_map(path4models+'quad-weights.hp'+str(nside)+'.fits', mapj, fits_IDL=False, dtype=np.float64, overwrite=True)
 #
 from argparse import ArgumentParser
 ap = ArgumentParser(description='Multivariate linear/quadratic regression')
 ap.add_argument('--input',  default='/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.5.r.npy')
-ap.add_argument('--ax',     nargs='*', type=int, default=[i for i in range(18)])
+ap.add_argument('--axfit',     nargs='*', type=int, default=[i for i in range(18)])
 ap.add_argument('--output', default='/Volumes/TimeMachine/data/DR7/results/regression/')
 ap.add_argument('--split',  action='store_true')
 ap.add_argument('--plots',  action='store_true')
+ap.add_argument('--nside',  type=int, default=256)
 ns = ap.parse_args()
 
 print('INPUTS :')
@@ -182,9 +183,9 @@ import os
 if not os.path.exists(ns.output):
     os.makedirs(ns.output)
     
-fitdata = DATA(ns.input, ns.ax, ns.output+'regression_log', split=ns.split)
+fitdata = DATA(ns.input, ns.axfit, ns.output+'regression_log', split=ns.split)
 if ns.plots:
    fitdata.plotbfitparam(ns.output+'bfit_params')
    fitdata.plotnnbardata(ns.output+'nnbar.pdf')
 
-fitdata.savemodels(ns.output) # only address
+fitdata.savemodels(ns.output, nside=ns.nside) # only address
