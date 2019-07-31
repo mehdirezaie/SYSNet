@@ -340,7 +340,7 @@ class XI_simple(object):
 
         
 def XI(theta1, phi1, theta2, phi2, delta1, delta2, weight1, weight2, bins, auto):
-    t1 = time()
+    #t1 = time()
     cosbins = np.cos(bins)
     w = paircount(theta1, phi1, theta2, phi2,\
                   delta1, delta2, weight1, weight2, cosbins, auto)
@@ -356,7 +356,7 @@ def run_XIsys(ouname, sysm, ranmap, mask, Return=False):
         return xijack.output
     else:
         np.save(ouname, xijack.output)
-        print('output is save in {}'.format(ouname))    
+        print('output is saved in {}'.format(ouname))    
         
 def run_XI(ouname, elgmap, ranmap, select_fun, mask, sysm=None, njack=20, Return=False):
     if njack==0:

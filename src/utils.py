@@ -37,6 +37,36 @@ except:
     
 from scipy.stats import binned_statistic
 
+
+
+def G_to_C(mapi, res_in=1024, res_out=256):
+    '''
+        Rotate the HI column density from G to C
+        to avoid its negative pixels
+    '''
+    thph  = hp.pix2ang(res_out, np.arange(12*res_out*res_out))
+    r     = hp.Rotator(coord=['C', 'G'])
+    thphg = r(thph[0], thph[1])
+    hpix  = hp.ang2pix(res_in, thphg[0], thphg[1])
+    return mapi[hpix]
+
+def fixHI(hifile='/Volumes/TimeMachine/data/NHI_HPX.fits', nside_out=256):
+    '''
+        read HI column density
+        rotate it from G to C ("decrease" nside if needed)
+        fill some negative pixels
+        by assigning the mean of neighbors
+    '''
+    assert (nside_out < 1024), 'nside_out should be < 1024'
+    # H II map
+    hii = ft.FITS(hifile, lower=True)
+    Hii = hii[1].read()
+    Hiic = G_to_C(Hii['nhi'], res_out=nside_out)
+    Hineg = np.argwhere(Hiic<=0.0).flatten()
+    neighbors = hp.get_all_neighbours(nside_out, Hineg)
+    Hiic[Hineg] = np.mean(Hiic[neighbors], axis=0) # fill in negative pixels
+    return Hiic
+
 def binit(el, cel, bins=None):
     '''
         bin the C_ell measurements
