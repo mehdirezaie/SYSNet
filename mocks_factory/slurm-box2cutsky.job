@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH -q regular 
+#SBATCH -t 00:05:00
+#SBATCH -N 1
+#SBATCH -J cutsky 
+#SBATCH -o cutsky-%j.out 
+#SBATCH -C haswell
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=mehdirezaie1990@gmail.com
+module load gsl
+
+
+#
+# run make_survey to make survey mock out of 3dbox mock
+# run with sbatch --array=1-100 
+#
+export CODE=$HOME/github/make_survey/make_survey
+export CONFIG_FILE=mock1_ngc.param 
+export MOCK_IN=$SCRATCH/mocks/3dbox/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID.dat
+export RDZW_OUT=$SCRATCH/mocks/3dbox/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID.cat
+
+srun -n 1 $CODE $CONFIG_FILE  $MOCK_IN  $RDZW_OUT
+

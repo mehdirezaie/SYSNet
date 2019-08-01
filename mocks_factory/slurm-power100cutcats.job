@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH -q regular
+#SBATCH -t 00:16:00
+#SBATCH -N 1
+#SBATCH -J powercut-mock
+#SBATCH -o pkcutcat-%j.out 
+#SBATCH -C haswell
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=mehdirezaie1990@gmail.com
+
+#
+# Batch script to run the convpower to get
+# P(k) for survey mocks
+# run it with
+# sbatch --array=1-100 slurm-power100cutcats.job
+#
+#
+#
+#
+module load python/3.6-anaconda-4.4
+source activate py3p6
+
+export INPUT=/global/cscratch1/sd/mehdi/mocks/3dbox/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID.cat
+export OUTPUT=/global/cscratch1/sd/mehdi/mocks/3dbox/3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID/powercut_3dbox_nmesh1024_L5274.0_bias1.5_seed$SLURM_ARRAY_TASK_ID.npy
+
+
+srun -n 1 python convpower.py --data $INPUT --output $OUTPUT --nmesh 1024
+
