@@ -37,7 +37,8 @@ class NNBAR(object):
             datat['ss'] = self.sysmap
             datat['gs'] = self.galmap
             datat['ws'] = self.ranmap
-            datat['rid'] = np.random.choice(np.arange(self.sysmap.size), size=self.sysmap.size, replace=False)
+            #datat['rid'] = np.random.choice(np.arange(self.sysmap.size), size=self.sysmap.size, replace=False)
+            datat['rid'] = np.random.permutation(np.arange(self.sysmap.size)) # 2x faster
             datas = np.sort(datat, order=['ss', 'rid'])
             ss, gs, ws = datas['ss'], datas['gs'], datas['ws']
             #ss, gs, ws = zip(*sorted(zip(self.sysmap, self.galmap, self.ranmap)))

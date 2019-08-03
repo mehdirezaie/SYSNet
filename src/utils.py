@@ -152,6 +152,19 @@ def hpix2radec(nside, pix):
     theta,phi = hp.pixelfunc.pix2ang(nside, pix)
     return np.degrees(phi), 90-np.degrees(theta)
 
+
+def projectradec2hp(nside, ra, dec, value, statistic='mean'):
+    '''
+        project a quantity (value) onto RA-DEC, and then healpix
+        with a given nside
+        default is 'mean', but can work with 'min', 'max', etc
+    '''
+    hpix = radec2hpix(nside, ra, dec)
+    nmax = 12*nside*nside
+    result = binned_statistic(hpix, value, statistic=statistic, 
+                                 bins=nmax, range=(0, nmax))[0]
+    return result
+
 def hpixsum(nside, ra, dec, value=None): 
     '''
         make a healpix map from ra-dec
