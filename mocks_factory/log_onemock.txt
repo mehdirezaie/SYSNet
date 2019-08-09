@@ -1,0 +1,22 @@
+# create the mock
+time python make_mocks.py --path /Volumes/TimeMachine/data/mocks_hj/ --nmesh 256 --bias 1.5
+3081439808
+finished in 99.16570973396301 s
+
+# run the power spectrum code
+python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh256_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh256_L5274.0_bias1.5_seed42/power.json --nmesh 256
+time to read the file 0.3717060089111328
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+finished in 13.78889799118042 s
+
+
+(py3p6) bash-3.2$ time python make_mocks.py --path /Volumes/TimeMachine/data/mocks_hj/ --nmesh 512 --bias 1.5
+3081439808
+finished in 759.8518760204315 s
+
+real    12m42.384s
+user    12m3.656s
+sys     1m0.063s
+
+
