@@ -4,8 +4,8 @@ import healpy as hp
 import numpy as np
 
 filename = '/Volumes/TimeMachine/data/DR7/mask.cut.hp.256.fits'
-weights  = glob('/Volumes/TimeMachine/data/DR7/results/regression/*/*weights.hp256.fits')
-
+weights = glob('/Volumes/TimeMachine/data/DR7/results/regression/*/*weights.hp256.fits')
+weights  = [ff for ff in weights if 'mult_ab' not in ff] # exclude ablation linear, it was used for mocks generation only
 
 
 mask    = hp.read_map('/Volumes/TimeMachine/data/DR7/mask.hp.256.fits', verbose=False).astype('bool')
