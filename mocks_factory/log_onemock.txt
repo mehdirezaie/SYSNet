@@ -1,3 +1,133 @@
+# Aug 8 : run with 1024
+#
+#    With Mpi the shotnoise estimation is wrong, 
+#    it could be because I am using an old version of nbodykit 0.3.5
+#    the way I read the data in the fftpower code.
+#    
+
+(py3p6) bash-3.2$ python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_512v2.json --nmesh 512
+time to read the file 0.3735489845275879
+[ 000004.91 ]   0: 08-09 12:48  CatalogMesh     INFO     painted 8388608 out of 28552383 objects to mesh
+[ 000007.96 ]   0: 08-09 12:48  CatalogMesh     INFO     painted 16777216 out of 28552383 objects to mesh
+[ 000010.98 ]   0: 08-09 12:48  CatalogMesh     INFO     painted 25165824 out of 28552383 objects to mesh
+[ 000012.24 ]   0: 08-09 12:48  CatalogMesh     INFO     painted 28552383 out of 28552383 objects to mesh
+[ 000012.30 ]   0: 08-09 12:48  CatalogMesh     INFO     painted 28552383 out of 28552383 objects to mesh
+[ 000012.30 ]   0: 08-09 12:48  CatalogMesh     INFO     mean particles per cell is 0.212732
+[ 000012.30 ]   0: 08-09 12:48  CatalogMesh     INFO     sum is 2.85524e+07 
+[ 000012.30 ]   0: 08-09 12:48  CatalogMesh     INFO     normalized the convention to 1 + delta
+[ 000015.18 ]   0: 08-09 12:48  CatalogMesh     INFO     field: (ArrayCatalog(size=28552383) as CatalogMesh) painting done
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+[ 000027.93 ]   0: 08-09 12:48  FFTPower        INFO     measurement done; saving result to /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_512v2.json
+finished in 27.572073936462402 s
+(py3p6) bash-3.2$ python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_1024v2.json --nmesh 1024
+time to read the file 0.3730490207672119
+[ 000006.95 ]   0: 08-09 12:51  CatalogMesh     INFO     painted 8388608 out of 28552383 objects to mesh
+[ 000010.37 ]   0: 08-09 12:51  CatalogMesh     INFO     painted 16777216 out of 28552383 objects to mesh
+[ 000013.75 ]   0: 08-09 12:51  CatalogMesh     INFO     painted 25165824 out of 28552383 objects to mesh
+[ 000015.15 ]   0: 08-09 12:51  CatalogMesh     INFO     painted 28552383 out of 28552383 objects to mesh
+[ 000015.52 ]   0: 08-09 12:51  CatalogMesh     INFO     painted 28552383 out of 28552383 objects to mesh
+[ 000015.52 ]   0: 08-09 12:51  CatalogMesh     INFO     mean particles per cell is 0.0265915
+[ 000015.52 ]   0: 08-09 12:51  CatalogMesh     INFO     sum is 2.85524e+07 
+[ 000015.52 ]   0: 08-09 12:51  CatalogMesh     INFO     normalized the convention to 1 + delta
+[ 000039.94 ]   0: 08-09 12:51  CatalogMesh     INFO     field: (ArrayCatalog(size=28552383) as CatalogMesh) painting done
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+[ 000163.74 ]   0: 08-09 12:53  FFTPower        INFO     measurement done; saving result to /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_1024v2.json
+finished in 163.40951585769653 s
+(py3p6) bash-3.2$ python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_256v2.json --nmesh 256
+time to read the file 0.38025808334350586
+[ 000004.61 ]   0: 08-09 12:54  CatalogMesh     INFO     painted 8388608 out of 28552383 objects to mesh
+[ 000007.57 ]   0: 08-09 12:54  CatalogMesh     INFO     painted 16777216 out of 28552383 objects to mesh
+[ 000010.51 ]   0: 08-09 12:54  CatalogMesh     INFO     painted 25165824 out of 28552383 objects to mesh
+[ 000011.74 ]   0: 08-09 12:54  CatalogMesh     INFO     painted 28552383 out of 28552383 objects to mesh
+[ 000011.75 ]   0: 08-09 12:54  CatalogMesh     INFO     painted 28552383 out of 28552383 objects to mesh
+[ 000011.75 ]   0: 08-09 12:54  CatalogMesh     INFO     mean particles per cell is 1.70185
+[ 000011.75 ]   0: 08-09 12:54  CatalogMesh     INFO     sum is 2.85524e+07 
+[ 000011.75 ]   0: 08-09 12:54  CatalogMesh     INFO     normalized the convention to 1 + delta
+[ 000012.14 ]   0: 08-09 12:54  CatalogMesh     INFO     field: (ArrayCatalog(size=28552383) as CatalogMesh) painting done
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+[ 000013.59 ]   0: 08-09 12:54  FFTPower        INFO     measurement done; saving result to /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_256v2.json
+finished in 13.224188804626465 s
+
+
+
+
+(py3p6) bash-3.2$ mpirun --oversubscribe -np 4 python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_256.json --nmesh 256
+time to read the file 0.7035400867462158
+time to read the file 0.6959531307220459
+time to read the file 0.7408268451690674
+time to read the file 0.7411301136016846
+[ 000006.84 ]   0: 08-09 12:35  CatalogMesh     INFO     painted 33554432 out of 114209532 objects to mesh
+[ 000011.29 ]   0: 08-09 12:35  CatalogMesh     INFO     painted 67108864 out of 114209532 objects to mesh
+[ 000016.23 ]   0: 08-09 12:36  CatalogMesh     INFO     painted 100663296 out of 114209532 objects to mesh
+[ 000018.19 ]   0: 08-09 12:36  CatalogMesh     INFO     painted 114209532 out of 114209532 objects to mesh
+[ 000018.20 ]   0: 08-09 12:36  CatalogMesh     INFO     painted 114209532 out of 114209532 objects to mesh
+[ 000018.20 ]   0: 08-09 12:36  CatalogMesh     INFO     mean particles per cell is 6.80742
+[ 000018.20 ]   0: 08-09 12:36  CatalogMesh     INFO     sum is 1.1421e+08 
+[ 000018.20 ]   0: 08-09 12:36  CatalogMesh     INFO     normalized the convention to 1 + delta
+[ 000018.41 ]   0: 08-09 12:36  CatalogMesh     INFO     field: (ArrayCatalog(size=28552383) as CatalogMesh) painting done
+finished in 18.26615619659424 s
+finished in 18.265947818756104 s
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+[ 000018.97 ]   0: 08-09 12:36  FFTPower        INFO     measurement done; saving result to /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_256.json
+finished in 18.26914119720459 s
+finished in 18.281002044677734 s
+
+(py3p6) bash-3.2$ mpirun --oversubscribe -np 4 python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_512.json --nmesh 512
+time to read the file 2.5200600624084473
+time to read the file 2.5200510025024414
+time to read the file 2.5201327800750732
+time to read the file 2.520020008087158
+[ 000008.91 ]   0: 08-09 12:34  CatalogMesh     INFO     painted 33554432 out of 114209532 objects to mesh
+[ 000013.41 ]   0: 08-09 12:35  CatalogMesh     INFO     painted 67108864 out of 114209532 objects to mesh
+[ 000018.47 ]   0: 08-09 12:35  CatalogMesh     INFO     painted 100663296 out of 114209532 objects to mesh
+[ 000020.48 ]   0: 08-09 12:35  CatalogMesh     INFO     painted 114209532 out of 114209532 objects to mesh
+[ 000020.51 ]   0: 08-09 12:35  CatalogMesh     INFO     painted 114209532 out of 114209532 objects to mesh
+[ 000020.51 ]   0: 08-09 12:35  CatalogMesh     INFO     mean particles per cell is 0.850927
+[ 000020.51 ]   0: 08-09 12:35  CatalogMesh     INFO     sum is 1.1421e+08 
+[ 000020.51 ]   0: 08-09 12:35  CatalogMesh     INFO     normalized the convention to 1 + delta
+[ 000022.01 ]   0: 08-09 12:35  CatalogMesh     INFO     field: (ArrayCatalog(size=28552383) as CatalogMesh) painting done
+finished in 24.092684030532837 s
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+[ 000026.62 ]   0: 08-09 12:35  FFTPower        INFO     measurement done; saving result to /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power_512.json
+finished in 24.107483863830566 s
+finished in 24.110307931900024 s
+finished in 24.165087938308716 s
+
+
+
+
+
+
+
+(py3p6) bash-3.2$ mpirun --oversubscribe -np 4 python fftpower.py --input /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42 --output /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power.json --nmesh 1024
+time to read the file 2.515993118286133
+time to read the file 2.5160748958587646
+time to read the file 2.516042947769165
+time to read the file 2.5161170959472656
+[ 000011.14 ]   0: 08-09 12:32  CatalogMesh     INFO     painted 33554432 out of 114209532 objects to mesh
+[ 000016.43 ]   0: 08-09 12:32  CatalogMesh     INFO     painted 67108864 out of 114209532 objects to mesh
+[ 000022.98 ]   0: 08-09 12:32  CatalogMesh     INFO     painted 100663296 out of 114209532 objects to mesh
+[ 000025.57 ]   0: 08-09 12:32  CatalogMesh     INFO     painted 114209532 out of 114209532 objects to mesh
+[ 000025.87 ]   0: 08-09 12:32  CatalogMesh     INFO     painted 114209532 out of 114209532 objects to mesh
+[ 000025.87 ]   0: 08-09 12:32  CatalogMesh     INFO     mean particles per cell is 0.106366
+[ 000025.87 ]   0: 08-09 12:32  CatalogMesh     INFO     sum is 1.1421e+08 
+[ 000025.87 ]   0: 08-09 12:32  CatalogMesh     INFO     normalized the convention to 1 + delta
+[ 000039.49 ]   0: 08-09 12:33  CatalogMesh     INFO     field: (ArrayCatalog(size=28552383) as CatalogMesh) painting done
+/Users/rezaie/anaconda3/envs/py3p6/lib/python3.6/site-packages/nbodykit/algorithms/fftpower.py:616: RuntimeWarning: invalid value encountered in sqrt
+  xslab **= 0.5
+[ 000091.61 ]   0: 08-09 12:33  FFTPower        INFO     measurement done; saving result to /Volumes/TimeMachine/data/mocks_hj/3dbox_nmesh512_L5274.0_bias1.5_seed42/power.json
+finished in 89.09728980064392 s
+finished in 89.09910678863525 s
+finished in 89.09953570365906 s
+finished in 89.17575192451477 s
+
+
+
 # create the mock
 time python make_mocks.py --path /Volumes/TimeMachine/data/mocks_hj/ --nmesh 256 --bias 1.5
 3081439808

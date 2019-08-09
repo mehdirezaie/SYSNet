@@ -8,7 +8,15 @@
 import nbodykit.lab as nb
 import nbodykit.io.bigfile as bf
 import numpy as np
+from nbodykit import setup_logging, style
+setup_logging() # turn on logging to screen
 
+
+
+from mpi4py import MPI
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()  
 
 
 def read_BigFile(filename):
