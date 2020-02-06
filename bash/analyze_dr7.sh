@@ -1,5 +1,6 @@
 #!/bin/bash
-source activate py3p6
+eval "$(/Users/rezaie/anaconda3/bin/conda shell.bash hook)"
+conda activate py3p6
 
 # codes
 ablation=/Users/rezaie/github/SYSNet/src/ablation.py
@@ -18,7 +19,9 @@ rnmp=/Volumes/TimeMachine/data/DR7/frac.hp.256.fits
 oudr_ab=/Volumes/TimeMachine/data/DR7/results/ablation/
 oudr_r=/Volumes/TimeMachine/data/DR7/results/regression/
 oudr_c=/Volumes/TimeMachine/data/DR7/results/clustering/
+oudr_rf=/Volumes/TimeMachine/data/DR7/results_referee/
 maskc=/Volumes/TimeMachine/data/DR7/mask.cut.hp.256.fits    # remove pixels with extreme weights
+maskdm=/Volumes/TimeMachine/data/DR7/mask_data_mock.cut.hp.256.fits
 mult1=mult_all
 mult2=mult_depz
 mult3=mult_ab
@@ -95,6 +98,23 @@ clab=cp2p
 # auto C_l for systematics
 #mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys --corsys xi_sys 
 
+
+# Jan 4, 2019: run NNbar for the data on the mock footprint
+# 20 minutes
+#for wname in uni lin quad
+#do
+#  wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#  du -h $glmp $rnmp $drfeat $maskdm $wmap
+#  mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rf --verbose --wmap $wmap --clfile cl_$wname --nnbar nnbar_$wname --corfile xi_$wname 
+#done
+#for nni in $nn1 $nn3
+#do
+# wmap=${oudr_r}${nni}/nn-weights.hp256.fits
+# du -h $wmap
+# mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rf --verbose --wmap $wmap --nnbar nnbar_$nni --clfile cl_$nni  --corfile xi_$nni 
+#done
+#mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rf --verbose --wmap none --clsys cl_sys --corsys xi_sys 
+#
 
 
 # ============= MOCKS =======================
@@ -298,14 +318,14 @@ clab=cp2p
 #done
 
 # one mock with Jackknife
-i=001
-mglmp=${pathmock}${i}/${i}${umockl}
-moudr_r=${pathmock}${i}/results/regression/
-moudr_c=${pathmock}${i}/results/clustering/
-multw=uni_wjack
-wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
-clnm=cl_${multw}
-echo "clustering on $mglmp w $wmap"
-mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 20
+#i=001
+#mglmp=${pathmock}${i}/${i}${umockl}
+#moudr_r=${pathmock}${i}/results/regression/
+#moudr_c=${pathmock}${i}/results/clustering/
+#multw=uni_wjack
+#wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
+#clnm=cl_${multw}
+#echo "clustering on $mglmp w $wmap"
+#mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 20
 
 
