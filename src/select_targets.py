@@ -4,8 +4,7 @@
     2. module load python/3.6
     3. source activate craympi
     4. srun -n 16 python select_targets.py
-
-    July 30: add brick_primary, tycho2inblob, decam_anymask for dr3
+    
 
 '''
 import fitsio as ft
