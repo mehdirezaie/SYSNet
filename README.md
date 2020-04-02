@@ -12,3 +12,5 @@ If you use this code in research that results in publications, please cite the f
 Rezaie, Mehdi and Seo, Hee-Jong and Ross, Ashley J. and Bunescu, Razvan C., 2019, MNRAS, submitted
 "Improving Galaxy Clustering Measurements with Deep Learning: analysis of the DECaLS DR7 data"
 ```
+
+April 2, 2020: new systematics mitigation and clustering analysis codes are now in https://github.com/mehdirezaie/LSSutils/
