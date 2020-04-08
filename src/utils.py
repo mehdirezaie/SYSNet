@@ -281,6 +281,43 @@ def clerr_jack(delta, mask, weight, njack=20, lmax=512):
     return dict(clerr=np.sqrt(clvar), cljks=cljks, clmaskj=clmaskj, clmask=clmask, sf=sf, sfj=sfj)
 
 
+def split_jackknife_new(hpix, weight, njack=20):
+    '''
+        split_jackknife(hpix, weight, label, features, njack=20)
+        split healpix-format data into k equi-area regions
+        hpix: healpix index shape = (N,)
+        weight: weight associated to each hpix 
+        label: label associated to each hpix
+        features: features associate to each pixel shape=(N,M) 
+    '''
+    f = weight.sum() // njack
+    hpix_L = []
+    hpix_l = []
+    frac_L = []
+    frac    = 0
+    w_L = []
+    w_l = []
+    #
+    #
+    for i in range(hpix.size):
+        frac += weight[i]            
+        hpix_l.append(hpix[i])
+        w_l.append(weight[i])
+        #
+        #
+        if frac >= f:
+            hpix_L.append(hpix_l)
+            frac_L.append(frac)
+            w_L.append(w_l)
+            frac    = 0
+            w_l     = []
+            hpix_l = []
+        elif (i == hpix.size-1) and (frac > 0.9*f):
+            hpix_L.append(hpix_l)
+            frac_L.append(frac)
+            w_L.append(w_l)
+    return hpix_L, w_L #, frac_L
+
 
 
 def split_jackknife(hpix, weight, label, features, njack=20):
