@@ -14,6 +14,7 @@ docont=/Users/rezaie/github/SYSNet/src/contaminate.py
 # output dirs & labels
 glmp=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.cut.hp256.fits
 glmp5=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.5.r.npy
+glmp5mocks=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.mocks.table.5.r.npy
 drfeat=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.fits
 rnmp=/Volumes/TimeMachine/data/DR7/frac.hp.256.fits
 oudr_ab=/Volumes/TimeMachine/data/DR7/results/ablation/
@@ -54,7 +55,7 @@ clab=cp2p
 # DATA
 # REGRESSION
 
-# Jun 21: Ablation on DR7
+# Jun 21, 19: Ablation on DR7
 # took 18 min
 # for rk in 0 1 2 3 4
 # do
@@ -65,11 +66,13 @@ clab=cp2p
 # Jun 9: Linear/quadratic multivariate fit on DR7 
 #         NN fit on DR7 with ablation
 #         Run DR7 NN fit w/o ablation
+# Apr 17, 20: NN on DR7 mock footprint w/o ablation 
 # python $multfit --input $glmp5 --output ${oudr_r}${mult1}/ --split
 # took around 20 secs
 # ablation picks up [0, 1, 2, 7, 10, 11, 12, 14, 16, 17]
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn3}/
+mpirun -np 5 python $nnfit --input $glmp5 --output ${oudr_rf}${nn3}/
 # took 75 min
 
 # fit linear with validation
@@ -122,37 +125,37 @@ clab=cp2p
 
 # Feb 6, 2020: run clustering for the data with different ebv masks
 # Feb 17, 2020: run clustering for the data on mock footprint with ebv cuts
-for maski in $maske12 $maske15
-do
-        if [ $maski == $maske12 ]
-        then
-            tag=ebv12
-        elif [ $maski == $maske15 ]
-        then
-            tag=ebv15
-        fi
+# for maski in $maske12 $maske15
+# do
+#         if [ $maski == $maske12 ]
+#         then
+#             tag=ebv12
+#         elif [ $maski == $maske15 ]
+#         then
+#             tag=ebv15
+#         fi
 
-        for wname in uni lin quad
-        do
-          outag=${wname}_${tag}
-          wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
-          du -h $glmp $rnmp $drfeat $maski $wmap
-          echo $outag
-          mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maski --oudir $oudr_rfebv --verbose --wmap $wmap --clfile cl_$outag --nnbar nnbar_$outag --corfile xi_$outag 
-        done
-        for nni in $nn1 $nn3
-        do
-         wmap=${oudr_r}${nni}/nn-weights.hp256.fits
-         outag=${nni}_${tag}
-         echo $outag
-         du -h $wmap
-         mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maski --oudir $oudr_rfebv --verbose --wmap $wmap --nnbar nnbar_$outag --clfile cl_$outag  --corfile xi_$outag 
-        done
-        outag=sys_${tag}
-        mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rfebv --verbose --wmap none --clsys cl_$outag --corsys xi_$outag
-        #
-        echo " "
-done
+#         for wname in uni lin quad
+#         do
+#           outag=${wname}_${tag}
+#           wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#           du -h $glmp $rnmp $drfeat $maski $wmap
+#           echo $outag
+#           mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maski --oudir $oudr_rfebv --verbose --wmap $wmap --clfile cl_$outag --nnbar nnbar_$outag --corfile xi_$outag 
+#         done
+#         for nni in $nn1 $nn3
+#         do
+#          wmap=${oudr_r}${nni}/nn-weights.hp256.fits
+#          outag=${nni}_${tag}
+#          echo $outag
+#          du -h $wmap
+#          mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maski --oudir $oudr_rfebv --verbose --wmap $wmap --nnbar nnbar_$outag --clfile cl_$outag  --corfile xi_$outag 
+#         done
+#         outag=sys_${tag}
+#         mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rfebv --verbose --wmap none --clsys cl_$outag --corsys xi_$outag
+#         #
+#         echo " "
+# done
 
 
 
