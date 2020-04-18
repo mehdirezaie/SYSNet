@@ -72,7 +72,7 @@ clab=cp2p
 # ablation picks up [0, 1, 2, 7, 10, 11, 12, 14, 16, 17]
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn3}/
-mpirun -np 5 python $nnfit --input $glmp5 --output ${oudr_rf}${nn3}/
+mpirun -np 5 python $nnfit --input $glmp5mocks --output ${oudr_rf}${nn3}/
 # took 75 min
 
 # fit linear with validation
