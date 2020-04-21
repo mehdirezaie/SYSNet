@@ -338,6 +338,17 @@ class XI_simple(object):
         self.bins = bins
         self.output = dict(t=self.bins, w=xi, dmean=self.mean1)
 
+
+def XIwindow(ouname, randoms, mask):
+    nside  = hp.get_nside(randoms)
+    bw     = hp.nside2resol(nside)
+    bins   = np.arange(bw, np.pi, bw)[::-1]
+    cbins  = np.cos(bins) 
+    theta, phi = hp.pix2ang(nside, np.argwhere(mask).flatten())
+    delta  = np.ones(mask.sum())
+    weight = randoms[mask]
+    counts = paircount(theta, phi, theta, phi, delta, delta, weight, weight, cbins, 1)
+    return bins, counts
         
 def XI(theta1, phi1, theta2, phi2, delta1, delta2, weight1, weight2, bins, auto):
     #t1 = time()

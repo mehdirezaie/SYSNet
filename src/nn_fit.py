@@ -13,7 +13,7 @@ from time import time
 
    
 def get_all(ablationlog):
-    d = np.load(ablationlog).item()
+    d = np.load(ablationlog, allow_pickle=True).item()
     indices = None
     for il, l in enumerate(d['validmin']):
         m = (np.array(l) - d['RMSEall']) > 0.0
@@ -68,7 +68,7 @@ if __name__ == '__main__':
                   tol=1.e-4, scale=0.0, learning_rate=0.001)
         log += 'reading input : {} with nside : {} \n'.format(ns.input, NSIDE)
         log += 'the fiducial config is {}\n'.format(config)
-        data   = np.load(ns.input).item()
+        data   = np.load(ns.input, allow_pickle=True).item()
         Ablog  = ns.ablog    
         Axfit  = ns.axfit
         oupath = ns.output

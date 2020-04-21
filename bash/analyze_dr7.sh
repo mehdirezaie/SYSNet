@@ -1,5 +1,6 @@
 #!/bin/bash
-source activate py3p6
+eval "$(/Users/rezaie/anaconda3/bin/conda shell.bash hook)"
+conda activate py3p6
 
 # codes
 ablation=/Users/rezaie/github/SYSNet/src/ablation.py
@@ -13,12 +14,18 @@ docont=/Users/rezaie/github/SYSNet/src/contaminate.py
 # output dirs & labels
 glmp=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.cut.hp256.fits
 glmp5=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.5.r.npy
+glmp5mocks=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.mocks.table.5.r.npy
 drfeat=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.fits
 rnmp=/Volumes/TimeMachine/data/DR7/frac.hp.256.fits
 oudr_ab=/Volumes/TimeMachine/data/DR7/results/ablation/
 oudr_r=/Volumes/TimeMachine/data/DR7/results/regression/
 oudr_c=/Volumes/TimeMachine/data/DR7/results/clustering/
+oudr_rf=/Volumes/TimeMachine/data/DR7/results_referee/
+oudr_rfebv=/Volumes/TimeMachine/data/DR7/results_referee/ebvmask/
 maskc=/Volumes/TimeMachine/data/DR7/mask.cut.hp.256.fits    # remove pixels with extreme weights
+maskdm=/Volumes/TimeMachine/data/DR7/mask_data_mock.cut.hp.256.fits
+maske15=/Volumes/TimeMachine/data/DR7/mask_data_mock.cut.ebvp15.hp.256.fits
+maske12=/Volumes/TimeMachine/data/DR7/mask_data_mock.cut.ebvp12.hp.256.fits
 mult1=mult_all
 mult2=mult_depz
 mult3=mult_ab
@@ -48,7 +55,7 @@ clab=cp2p
 # DATA
 # REGRESSION
 
-# Jun 21: Ablation on DR7
+# Jun 21, 19: Ablation on DR7
 # took 18 min
 # for rk in 0 1 2 3 4
 # do
@@ -59,11 +66,13 @@ clab=cp2p
 # Jun 9: Linear/quadratic multivariate fit on DR7 
 #         NN fit on DR7 with ablation
 #         Run DR7 NN fit w/o ablation
+# Apr 17, 20: NN on DR7 mock footprint w/o ablation 
 # python $multfit --input $glmp5 --output ${oudr_r}${mult1}/ --split
 # took around 20 secs
 # ablation picks up [0, 1, 2, 7, 10, 11, 12, 14, 16, 17]
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn3}/
+mpirun -np 5 python $nnfit --input $glmp5mocks --output ${oudr_rf}${nn3}/
 # took 75 min
 
 # fit linear with validation
@@ -94,6 +103,61 @@ clab=cp2p
 #
 # auto C_l for systematics
 #mpirun --oversubscribe -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskc --oudir $oudr_c --verbose --wmap none --clsys cl_sys --corsys xi_sys 
+
+
+# Jan 4, 2020: run NNbar for the data on the mock footprint
+# 20 minutes
+#for wname in uni lin quad
+#do
+#  wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#  du -h $glmp $rnmp $drfeat $maskdm $wmap
+#  mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rf --verbose --wmap $wmap --clfile cl_$wname --nnbar nnbar_$wname --corfile xi_$wname 
+#done
+#for nni in $nn1 $nn3
+#do
+# wmap=${oudr_r}${nni}/nn-weights.hp256.fits
+# du -h $wmap
+# mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rf --verbose --wmap $wmap --nnbar nnbar_$nni --clfile cl_$nni  --corfile xi_$nni 
+#done
+#mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rf --verbose --wmap none --clsys cl_sys --corsys xi_sys 
+#
+
+
+# Feb 6, 2020: run clustering for the data with different ebv masks
+# Feb 17, 2020: run clustering for the data on mock footprint with ebv cuts
+# for maski in $maske12 $maske15
+# do
+#         if [ $maski == $maske12 ]
+#         then
+#             tag=ebv12
+#         elif [ $maski == $maske15 ]
+#         then
+#             tag=ebv15
+#         fi
+
+#         for wname in uni lin quad
+#         do
+#           outag=${wname}_${tag}
+#           wmap=${oudr_r}${mult1}/${wname}-weights.hp256.fits
+#           du -h $glmp $rnmp $drfeat $maski $wmap
+#           echo $outag
+#           mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maski --oudir $oudr_rfebv --verbose --wmap $wmap --clfile cl_$outag --nnbar nnbar_$outag --corfile xi_$outag 
+#         done
+#         for nni in $nn1 $nn3
+#         do
+#          wmap=${oudr_r}${nni}/nn-weights.hp256.fits
+#          outag=${nni}_${tag}
+#          echo $outag
+#          du -h $wmap
+#          mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maski --oudir $oudr_rfebv --verbose --wmap $wmap --nnbar nnbar_$outag --clfile cl_$outag  --corfile xi_$outag 
+#         done
+#         outag=sys_${tag}
+#         mpirun -np 4 python $docl --galmap $glmp --ranmap $rnmp --photattrs $drfeat --mask $maskdm --oudir $oudr_rfebv --verbose --wmap none --clsys cl_$outag --corsys xi_$outag
+#         #
+#         echo " "
+# done
+
+
 
 
 
@@ -298,14 +362,14 @@ clab=cp2p
 #done
 
 # one mock with Jackknife
-i=001
-mglmp=${pathmock}${i}/${i}${umockl}
-moudr_r=${pathmock}${i}/results/regression/
-moudr_c=${pathmock}${i}/results/clustering/
-multw=uni_wjack
-wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
-clnm=cl_${multw}
-echo "clustering on $mglmp w $wmap"
-mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 20
+#i=001
+#mglmp=${pathmock}${i}/${i}${umockl}
+#moudr_r=${pathmock}${i}/results/regression/
+#moudr_c=${pathmock}${i}/results/clustering/
+#multw=uni_wjack
+#wmap=${moudr_r}${mult1}/${multw}-weights.hp256.fits
+#clnm=cl_${multw}
+#echo "clustering on $mglmp w $wmap"
+#mpirun --oversubscribe -np 4 python $docl --galmap ${mglmp} --ranmap ${mfrac} --photattrs ${mockfeat} --wmap $wmap --mask ${mmaskcl} --clfile ${clnm} --oudir ${moudr_c} --verbose --njack 20
 
 
