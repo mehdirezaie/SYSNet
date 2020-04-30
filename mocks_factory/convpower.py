@@ -12,7 +12,6 @@ import fitsio as ft
 from argparse import ArgumentParser
 np.random.seed(1234)
 import sys
-sys.path.append('/global/homes/m/mehdi/github/DESILSS')
 from syslss import powerspectrum
 
 class CAT(object):

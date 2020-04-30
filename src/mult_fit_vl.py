@@ -7,8 +7,6 @@ import os
 import numpy as np
 from time import time
 import sys
-HOME = os.getenv('HOME')
-sys.path.append(HOME + '/github/DESILSS')
 from scipy.optimize import curve_fit
 
 def model(x, *theta):

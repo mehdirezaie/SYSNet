@@ -1,0 +1,44 @@
+\section{conclusion}\label{sec:conclusion}
+In this paper, we have presented a rigorous application of an artificial neural network methodology to the mitigation of the observational systematics in galaxy clustering measurements of an eBOSS-like ELG sample selected from DR7 (see \S~\ref{sec:data}). We have investigated the galaxy density dependency on 18 imaging attributes of the data (see Fig. \ref{fig:eboss_dr7}). We compare the performance of the neural network with that of the traditional, linear and quadratic multivariate regression methods. The key aspects of our neural network methodology are:\\
+
+\begin{itemize}
+    \item The application of k-fold cross-validation, which implements the training-validation-test split to tune the hyper parameters by evaluating how well the trained network generalizes to the unseen,  validation data set and therefore to suppress overfitting when applied to the test set;
+    
+    \item The repeated split process until we cover the entire data footprint as test sets;
+    
+    \item The elimination of redundant imaging maps by the feature selection procedure to further reduce the overfitting problem and therefore protect the cosmological clustering signal.
+\end{itemize}
+
+
+We apply the output of our pipeline, i.e., the selection mask for the DR7 footprint to the observed galaxy density field. Benchmark selection masks are also produced employing the linear and quadratic polynomial regression. Comparing statistical results before and after applying the selection masks, we find that:\\
+\begin{itemize}
+    \item Galactic foregrounds are the most dominant source of contamination in this imaging dataset (see Figs. \ref{fig:nnbar}, \ref{fig:clcross}, and \ref{fig:xicross}).
+    
+    \item This contamination causes an excess clustering signal in the auto power spectrum and correlation function of the galaxy density field on large scales (see Fig. \ref{fig:clxi}).
+    
+    \item All mitigation techniques e.g., the neural network method as well as the linear multivariate models using the linear and quadratic polynomial functions, are able to reduce the auto and cross clustering signals (see Figs. \ref{fig:xicross} and \ref{fig:clcross});
+    
+    \item However, the neural network removes the excess clustering more effectively in the auto power spectrum and correlation function of galaxies (see Fig. \ref{fig:clxi}).
+\end{itemize}
+
+The last result implies that our neural network method has a higher flexibility than both linear multivariate models we tested, and it is therefore capable of capturing the non-linear systematic effects in the observed galaxy density field.\\
+
+We apply our methodology on two sets of 100 log-normal mock datasets with (`contaminated mocks') and without (`null mocks') imaging contamination to evaluate how well the ground truth cosmological clustering can be reconstructed in both cases, and therefore to validate the systematic mitigation techniques. All mitigation techniques are applied in the same way we treat the real data. The key results of our mock test are as follows:\\
+
+\begin{itemize}
+    \item The feature selection procedure is able to identify most of the ten contamination input maps as important for the contaminated mocks while correctly identifying most of the maps as redundant for the null mocks (see Fig. \ref{fig:mockablation}).
+    
+    \item All three mitigation methods, i.e., the linear polynomial, quadratic polynomial, and neural network methods, perform similarly in terms of the residual bias in the presence of contamination. This is expected since the contamination model is based on the linear polynomial model which all three methods are capable of reproducing. The default neural network tends to slightly under-correct which is the outcome of the feature selection procedure. On the other hand, the linear and quadratic polynomial methods tend to slightly over-correct (see the right panel of Fig. \ref{fig:deltaclmock}).;
+    
+    \item In the absence of contamination, the neural network is the most robust against regressing out the cosmological clustering. This is mainly due to the feature selection process that appropriately reduces the flexibility of the mitigation (see the left panel of Fig. \ref{fig:deltaclmock}). Based on this result, we implement the feature selection procedure for DR7.
+    
+    \item Using $\chi^{2}$ statistics, we quantify the bias and find that for the null mocks, the default neural network recovers the underlying clustering within $1\sigma$ C.L. (see Eq. \ref{eq:chi2sigma}) while the other methods return more than $4\sigma$ C.L. bias. For the contaminated mocks, all of the methods return biased clustering with $2.8-3.9\sigma$ C.L. which indicates that it is crucial for cosmological parameter estimation to determine the residual systematic uncertainty in scales sensitive to the parameters of interest (see the middle panels of Figs \ref{fig:deltaclmock} and \ref{fig:mockdclextra}).
+    
+    \item All methods do not increase fractional variance during the mitigation process (see the bottom row of Fig. \ref{fig:deltaclmock}).\\
+        
+\end{itemize}
+
+We also employ the mocks to investigate the remaining systematic effects in the data (Figs \ref{fig:nnbar}-\ref{fig:xicross}). While the neural network methods outperform the conventional methods, we conclude that the data exhibit around 19\% residual systematics in the target number density (Figs \ref{fig:chi2pdf} \& \ref{fig:chi2breakdown}). Our analysis suggests that a more rigorous masking on  $depth-g$ (e.g., $depth-g>24.95$) improves the mean density at the cost of losing $9\%$ of data. To use this sample for cosmology, we therefore suggest a) accounting for 19\%  (or more, depending on the assumption on the baseline) additional systematic errors to the statistical errors in the density field level; b) performing further analysis of systematics and improvement of the mitigation method to deal with the depth and sky background issues.\\
+
+
+To conclude, our analyses illustrate that the neural network method we developed in this paper is a promising tool for the mitigation of the large-scale spurious clustering that is likely raised by the imaging systematics. Our method is more robust against regressing out the cosmological clustering than the traditional, linear multivariate regression methods. Such improvement will be particularly crucial for an accurate measurement of non-Gaussianity from the large-scale clustering of current eBOSS and upcoming DESI and the LSST surveys. Our method is computationally less intensive than other approaches such as the Monte Carlo injection of fake galaxies: analyzing DR7 using our default neural network method requires less than six CPU hours. Application of our methodology on any imaging dataset would be straightforward. Our systematics mitigation methodology pipeline is publicly available at \url{https://github.com/mehdirezaie/SYSNet}.

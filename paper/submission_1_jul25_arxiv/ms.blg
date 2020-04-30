@@ -1,0 +1,65 @@
+This is BibTeX, Version 0.99d (TeX Live 2018)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: ms.aux
+The style file: mnras.bst
+Database file #1: refs.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1706 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1706 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1706 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1706 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1706 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1706 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1822 of file mnras.bst
+Too many commas in name 1 of "Dark Energy Survey Collaboration: Fermilab, University of Illinois at Urbana-Champaign, University of Chicago, Lawrence Berkeley National Laboratory, Cerro-Tololo Inter-American Observatory and Flaugher, Brenna" for entry dark2005dark
+while executing---line 1822 of file mnras.bst
+You've used 94 entries,
+            2881 wiz_defined-function locations,
+            1286 strings with 38313 characters,
+and the built_in function-call counts, 42998 in all, are:
+= -- 3696
+> -- 2881
+< -- 181
++ -- 1337
+- -- 356
+* -- 4941
+:= -- 6579
+add.period$ -- 0
+call.type$ -- 94
+change.case$ -- 189
+chr.to.int$ -- 93
+cite$ -- 94
+duplicate$ -- 2204
+empty$ -- 2290
+format.name$ -- 676
+if$ -- 7616
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 94
+newline$ -- 299
+num.names$ -- 596
+pop$ -- 495
+preamble$ -- 1
+purify$ -- 376
+quote$ -- 0
+skip$ -- 1363
+stack$ -- 0
+substring$ -- 2688
+swap$ -- 1009
+text.length$ -- 385
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 843
+warning$ -- 0
+while$ -- 674
+width$ -- 0
+write$ -- 946
+(There were 8 error messages)

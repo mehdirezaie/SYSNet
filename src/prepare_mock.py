@@ -15,7 +15,6 @@ import numpy as np
 import fitsio as ft
 import sys
 import healpy as hp
-sys.path.append('/Users/rezaie/github/DESILSS')
 #from tools import hpix2radec
 
 

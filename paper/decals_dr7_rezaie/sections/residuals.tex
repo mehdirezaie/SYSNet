@@ -1,0 +1,32 @@
+\section{Residual systematics}
+We measure the mean density of the data as a function imaging parameters, but limited to the mock footprint. This enables a null test based on the $\chi^{2}$ statistics to evaluate the performance of systematics mitigation. The null hypothesis is that the mean density in each bin of a particular imaging systematic $s_{k}$ should be equal to the global average density $\overline{n}_{tot}$, or the ratio should be one. Then, we have 
+\begin{equation}\label{eq:chi2nnbar}
+    \chi^{2} = \sum_{s}\sum_{k} (1/\sigma^{2})[\frac{\overline{n}(s_{k})}{\overline{n}_{tot}}-1]^{2},
+\end{equation}
+where index k runs over the different bins, and index s runs over the different imaging systematics (see eqs. \ref{eq:nnbar_stat} and \ref{eq:error_jack}). The total number of terms is the number of bins multiplied by the number of the imaging maps, 20x18=360. We construct the distribution of the $\chi^{2}$ statistics by measuring the same quantity with the simulated data sets. Fig. \ref{fig:chi2pdf} represents the distributions of the $\chi^{2}$ for the null mocks (solid), contaminated mocks (dashed), and contaminated mocks after mitigation (dot-dashed). The vertical lines show the $\chi^{2}$ values of the data. The $\chi^{2}$ values observed in the data are 9567.1 (before treatment), 2066.7 (linear treatment), 1212.0 (quadratic treatment), 767.3 (Neural Network treatment), and 744.4 (Neural Network plain treatment). We also compute the observed $\chi^{2}$ value in the data after applying masking on the galactic extinction. With the NN-based treatment, we obtain 766.6 and 714.4 respectively for masking out EBV > 0.15 and EBV > 0.12.
+
+The mean and standard deviation for the distribution of $\chi^{2}$  values observed in the null mocks are 487.1 and 49.2, respectively. The same quantities in the contaminated mocks are 2819.0 and 293.0, while in the contaminated mocks after Neural Network mitigation are 472.0 and 65.9. The mean $\chi^{2}$ observed in the contaminated mocks is much smaller than the value observed in the data (2819.0 < 9567.1). This indicates that the contamination introduced in the mocks is not as strong as in the real data. Future work will incorporate much more sophisticated systematics. 
+
+
+We perform a hypothesis testing given the $\chi^{2}$ value observed in the data after neural network mitigation (767.3) and the distribution of $\chi^{2}$ values in the null mocks.
+If the terms in Eq. \ref{eq:chi2nnbar} were independent and normal deviates, we would have expected that $\chi^{2}$ follow a Chi-squared distribution with the mean being around 360. Nevertheless, we assume that the $\chi^{2}$ values observed in the mocks follow a Chi-squared distribution with the degree of freedom (dof) being equal to 487. We set the threshold of $\alpha$=0.05 and perform a one-tail test. For dof=487,
+\begin{equation}
+    P(\chi^{2}>593.4 | dof=487) = 0.05
+\end{equation}
+Given that the observed $\chi^{2}$ value in the data (after treatment) 767.3 is larger than 593.4, we can reject the null hypothesis that the data is completely clean. Therefore, this data set cannot be used for cosmology. This means that the 40\% excess in the residual squared could have been removed if we had achieved a 20\% better modeling of the target density or kept the errorbars under the control by 20\%. 
+
+The residual systematic effects are going to be due to known systematics that we had the template for since this test was based on the mean density vs the imaging systematics. Fig. \ref{fig:chi2breakdown} shows the contribution of each systematic to Eq. \ref{eq:chi2nnbar} for the $\chi^{2}$ values observed in the data after linear (light blue), quadratic (red), and neural network plain (dark blue) treatments. Further investigations on the templates for the depth-g, skymag-g, skymag-z, EBV, lnHI, and MJD-z along with the resolution used for pixelization or the cost function are needed, however the suggested analysis is beyond the scope of this paper. Also, our test does not show that there is no unknown systematic effects. We suggest that further analyses on the moments of density contrast ($\delta$) incorporating more realistic mock datasets could provide an insight on unknown systematics.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{fig25-crop.pdf}
+    \caption{\textit{Left}: $\chi^{2}$ distribution for the null mocks (solid black), contaminated mocks (dashed black), and contaminated mocks with NN mitigation (dot-dashed black). The vertical dotted lines overlay the $\chi^{2}$ values for the data with NN correction (blue), quadratic correction (purple), and linear correction (dark red). The $\chi^{2}$ statistics before treatment is shown on the right (red).}
+    \label{fig:chi2pdf}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{fig26-crop.pdf}
+    \caption{ The breakdown of $\chi^{2}$ values observed in the data after linear (light purple), quadratic (dark purple), neural network with feature selection (red), and neural network plain (light blue) treatments. We also plot the 95-th percentile of the same quantity observed in the null mocks by a solid orange curve (note that $\chi^{2}(\textbf{s)}$ is not a continuous quantity). Given the 5\% threshold, we can argue that there exists known residual systematics against EBV, depth-g, skymag-gz, and MJD-z.}
+    \label{fig:chi2breakdown}
+\end{figure}

@@ -1,4 +1,9 @@
 #!/bin/bash
+
+
+#
+# activate your environment
+#
 eval "$(/Users/rezaie/anaconda3/bin/conda shell.bash hook)"
 conda activate py3p6
 
@@ -10,7 +15,7 @@ split=/Users/rezaie/github/SYSNet/src/add_features-split.py
 docl=/Users/rezaie/github/SYSNet/src/run_pipeline.py
 docont=/Users/rezaie/github/SYSNet/src/contaminate.py
 
-# DATA
+# DATA RELEASE 7
 # output dirs & labels
 glmp=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.cut.hp256.fits
 glmp5=/Volumes/TimeMachine/data/DR7/eBOSS.ELG.NGC.DR7.table.5.r.npy
@@ -72,7 +77,7 @@ clab=cp2p
 # ablation picks up [0, 1, 2, 7, 10, 11, 12, 14, 16, 17]
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn1}/ --ablog ${oudr_ab}${log_ab}
 #mpirun --oversubscribe -np 5 python $nnfit --input $glmp5 --output ${oudr_r}${nn3}/
-mpirun -np 5 python $nnfit --input $glmp5mocks --output ${oudr_rf}${nn3}/
+# mpirun -np 5 python $nnfit --input $glmp5mocks --output ${oudr_rf}${nn3}/  # run nn on data on mock footprint
 # took 75 min
 
 # fit linear with validation

@@ -219,5 +219,4 @@ dependencies:
     - tf-nightly==1.10.0.dev20180614
     - werkzeug==0.14.1
     - wrapt==1.11.2
-prefix: /Users/rezaie/anaconda3/envs/py3p6
 
