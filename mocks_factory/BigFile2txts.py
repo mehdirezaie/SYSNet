@@ -40,8 +40,8 @@ if rank == 0:
     ap.add_argument('--path',   default='/global/cscratch1/sd/mehdi/mocks/3dbox/')
     ap.add_argument('--ext', default='*') 
     ns = ap.parse_args()
-    #FILES = glob(ns.path+ns.ext) # seed 0 to 100 already done
-    FILES = [ns.path+'3dbox_nmesh1024_L5274.0_bias1.5_seed'+str(i) for i in range(101, 201)]
+    FILES = glob(ns.path+ns.ext) # if seed 0 to 100 already done > use next line
+    #FILES = [ns.path+'3dbox_nmesh1024_L5274.0_bias1.5_seed'+str(i) for i in range(101, 201)]
 else:
     FILES = None
 
