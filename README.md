@@ -7,10 +7,28 @@ The strengths and weaknesses of the method is investigated using two sets of sim
 * Mocks without any contamination: to assess how much bias and variance is introduced in the absence of any systematic effects
 * Mocks with contamination : a multivariate function of 10 maps to evaluate the performance of the feature elimination and the neural network.
 
-If you use this code in research that results in publications, please cite the following paper:
+The software is still under development and documentation. If you need to use this code in research please contact me at mr095415@ohio.edu:
 ```
-Rezaie, Mehdi and Seo, Hee-Jong and Ross, Ashley J. and Bunescu, Razvan C., 2019, MNRAS, submitted
-"Improving Galaxy Clustering Measurements with Deep Learning: analysis of the DECaLS DR7 data"
+@ARTICLE{2020MNRAS.495.1613R,
+       author = {{Rezaie}, Mehdi and {Seo}, Hee-Jong and {Ross}, Ashley J. and
+         {Bunescu}, Razvan C.},
+        title = "{Improving galaxy clustering measurements with deep learning: analysis of the DECaLS DR7 data}",
+      journal = {\mnras},
+     keywords = {editorials, notices, miscellaneous, catalogues, surveys, Astrophysics - Cosmology and Nongalactic Astrophysics, Astrophysics - Instrumentation and Methods for Astrophysics, Physics - Data Analysis, Statistics and Probability},
+         year = 2020,
+        month = may,
+       volume = {495},
+       number = {2},
+        pages = {1613-1640},
+          doi = {10.1093/mnras/staa1231},
+archivePrefix = {arXiv},
+       eprint = {1907.11355},
+ primaryClass = {astro-ph.CO},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2020MNRAS.495.1613R},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+"
 ```
 
-April 2, 2020: new systematics mitigation and clustering analysis codes are now in https://github.com/mehdirezaie/LSSutils/
+April 2, 2020: new systematics mitigation and clustering analysis codes are now in https://github.com/mehdirezaie/LSSutils/           
+July 16, 2020: new systematics mitigation pipeline based on Pytorch in https://github.com/mehdirezaie/sysnetdev/
