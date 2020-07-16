@@ -7,7 +7,7 @@ The strengths and weaknesses of the method is investigated using two sets of sim
 * Mocks without any contamination: to assess how much bias and variance is introduced in the absence of any systematic effects
 * Mocks with contamination : a multivariate function of 10 maps to evaluate the performance of the feature elimination and the neural network.
 
-The software is still under development and documentation. If you need to use this code in research please contact me at mr095415@ohio.edu:
+The software is still under development and documentation. If you need to use this code in research please contact me at mr095415@ohio.edu. If you would like to cite my paper, here is the full bibtex:
 ```
 @ARTICLE{2020MNRAS.495.1613R,
        author = {{Rezaie}, Mehdi and {Seo}, Hee-Jong and {Ross}, Ashley J. and
@@ -27,7 +27,6 @@ archivePrefix = {arXiv},
        adsurl = {https://ui.adsabs.harvard.edu/abs/2020MNRAS.495.1613R},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
-"
 ```
 
 April 2, 2020: new systematics mitigation and clustering analysis codes are now in https://github.com/mehdirezaie/LSSutils/           
