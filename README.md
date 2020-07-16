@@ -8,7 +8,7 @@ The strengths and weaknesses of the method is investigated using two sets of sim
 * Mocks with contamination : a multivariate function of 10 maps to evaluate the performance of the feature elimination and the neural network.
 
 The software is still under development and documentation. If you need to use this code in research please contact me at mr095415@ohio.edu. If you would like to cite my paper, here is the full bibtex:
-```
+```bibtex
 @ARTICLE{2020MNRAS.495.1613R,
        author = {{Rezaie}, Mehdi and {Seo}, Hee-Jong and {Ross}, Ashley J. and
          {Bunescu}, Razvan C.},
